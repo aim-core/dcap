@@ -1,14 +1,17 @@
+
 <div align="center">
 
-# DCAVP
+# 🛡️ DCAVP
 
-**Security analysis for AI-generated Python code.**
+**Deterministic Code Analysis & Verification Platform**
 
+Security analysis for AI-generated Python code.
 Find dangerous patterns before they reach production.
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)
-[![Tests](https://img.shields.io/badge/tests-491%20passing-brightgreen.svg)](#)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
+[![Self-Verified](https://img.shields.io/badge/self--verification-6%2F6-brightgreen.svg)](#)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](#)
 
 </div>
 
@@ -20,81 +23,107 @@ Scans your Python code for security issues that AI generators (ChatGPT, Claude, 
 
 ```bash
 pip install dcavp
-dcavp check ./my_project
-```
-
-**Output:**
-
-```
-────────────────────────────────────────────────────
-  DCAVP Security Scan
-────────────────────────────────────────────────────
-  Score     35 / 100   🔴  DANGER
-  Grade     F
-  Files     3 analyzed
-
-  Do not ship — 3 critical issues found that attackers can exploit.
-
-────────────────────────────────────────────────────
-  Issues Found
-────────────────────────────────────────────────────
-
-  💀  CRITICAL   payment.py line 6
-  External data flows directly into code execution
-  Network/user data reaches eval() — this is a critical attack surface.
-  Fix: Remove eval(). Parse data with json.loads() or a schema validator.
-
-  💀  CRITICAL   payment.py line 9
-  Shell commands built from external input
-  A semicolon or pipe in user input runs arbitrary system commands.
-  Fix: Remove shell=True. Use: subprocess.run(['cmd', arg])
-
-  💀  CRITICAL   auth.py line 18
-  Weak random numbers used for security tokens
-  Python's random is predictable. An attacker can guess your tokens.
-  Fix: Replace random.hex() with secrets.token_hex(32)
-────────────────────────────────────────────────────
-  Most Important Fix Right Now
-  Remove eval(). Parse data with json.loads() or a schema validator.
-────────────────────────────────────────────────────
-```
-
----
-
-## Install
-
-```bash
-pip install dcavp
-```
-
-Requires Python 3.12+. No external dependencies.
-
----
-
-## Usage
-
-```bash
-# Scan a project (human-readable output)
-dcavp check ./my_project
+dcavp analyze ./my_project
+Quick Start
+bash
+# Basic analysis (human-readable output)
+dcavp analyze ./my_project
 
 # Generate HTML report
-dcavp check ./my_project --format html --output report.html
+dcavp analyze ./my_project --format html
 
-# CI mode: fail if critical issues exist
-dcavp check . --fail-on critical
+# Generate JSON report for CI/CD
+dcavp analyze ./my_project --format json
 
-# Stricter analysis
-dcavp check . --tier YELLOW
+# Strict analysis (military-grade)
+dcavp analyze ./my_project --tier RED
 
-# Show dependency risks
-dcavp catalog
-```
+# Run self-verification (the platform verifies itself)
+dcavp verify
+Analysis Tiers
+Four tiers for every stage of the development lifecycle:
 
----
+Tier	Speed	Strictness	Use Case
+🟢 GREEN	Fastest	Basic warnings	Education, quick checks
+🔵 BLUE	Fast	Standard	CI/CD default, teams
+🟡 YELLOW	Moderate	Industrial	Regulated software, supply chain
+🔴 RED	Thorough	Military-Grade	Aerospace, defense, safety-critical
+Each tier progressively unlocks deeper analysis. Choose the right level for your risk profile.
 
-## GitHub Actions
+What it catches
+Pattern	Risk	CWE
+eval() / exec()	Remote code execution	CWE-94
+subprocess with shell=True	OS command injection	CWE-78
+open() without context manager	Resource leak, path traversal	CWE-22
+Mutable global state	Data corruption, non-determinism	CWE-1108
+__import__ dynamic imports	Hidden code execution	CWE-94
+Every finding includes:
 
-```yaml
+Exact file location (file:line:column)
+
+Detected state (e.g., external_source_arg)
+
+Plain-English explanation
+
+Recommended fix
+
+CWE reference
+
+HTML Reports
+Generate standalone, shareable security reports:
+
+bash
+dcavp analyze ./my_project --tier RED --format html
+Each HTML report includes:
+
+Trust Score with verification badges
+
+Executive Summary (files, nodes, findings, scan time)
+
+Detailed Findings with fix recommendations and CWE references
+
+Tier Comparison showing what deeper analysis unlocks
+
+Enterprise Features Preview with upgrade path
+
+Cryptographic Verification Certificate
+
+Reports are self-contained HTML files — no server, no dependencies. Share them with auditors, clients, or your team.
+
+Trust Score
+Every analysis produces a Trust Score (0–1000):
+
+text
+Trust: 1000/1000 ████████████████████ 100%
+✅ Analysis Integrity    ✅ Catalog Verified
+✅ Triple Replay Match   ✅ Artifact Signed
+The Trust Score reflects the honesty of the analysis itself — not your code quality. A score of 1000 means the analysis is cryptographically verifiable and reproducible.
+
+Proof Certificate
+Every scan produces a cryptographic artifact:
+
+text
+Artifact Hash: sha256:3a14975bbfe73f7d0cacad7afa0b9bd12a5a11986...
+This hash uniquely identifies this exact analysis. Given the same source code, catalog version, and execution seed, anyone can reproduce the identical artifact. This is your audit trail — shareable without revealing source code.
+
+Self-Verification
+DCAVP verifies itself before it verifies you:
+
+bash
+dcavp verify
+The platform runs 6 governance checks on its own source code under RED tier:
+
+Check	Purpose
+CHECK-SV-001	Catalog Merkle Integrity
+CHECK-SV-002	Policy Source References
+CHECK-SV-003	Dependency Whitelist
+CHECK-SV-004	RED Tier Self-Analysis
+CHECK-SV-005	Triple Replay Validation
+CHECK-SV-006	Governance Gates
+6/6 must pass. A platform that cannot verify itself cannot verify other software.
+
+GitHub Actions
+yaml
 name: DCAVP Security Scan
 on: [push, pull_request]
 
@@ -107,97 +136,68 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install dcavp
-      - run: dcavp check . --fail-on critical --format html --output report.html
+      - run: dcavp analyze . --tier RED --format html
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: security-report
-          path: report.html
-```
+          path: dcavp-report.html
+How it's different
+Feature	DCAVP	Snyk	SonarQube	Bandit
+Deterministic results	✅ Always	❌ No	❌ No	✅ Yes
+Plain-English findings	✅ Yes	Partial	Partial	❌ No
+Self-verification	✅ 6/6 Gates	❌ No	❌ No	❌ No
+Proof Certificate	✅ Yes	❌ No	❌ No	❌ No
+AI code patterns	✅ Yes	Partial	❌ No	❌ No
+Cross-platform	✅ Win/Lin/Mac	✅ Yes	✅ Yes	✅ Yes
+Zero dependencies	✅ Stdlib only	❌ API	❌ Server	✅ Yes
+Tiered governance	✅ 4 Tiers	❌ No	❌ No	❌ No
+HTML reports	✅ Standalone	✅ Yes	✅ Yes	❌ No
+Install
+bash
+pip install dcavp
+Requires Python 3.12+. No external dependencies. The entire platform runs on Python standard library.
 
----
+Commands
+bash
+dcavp analyze <path>     # Run security analysis
+dcavp verify             # Run self-verification
+dcavp catalog            # Show catalog information
+Options for analyze:
 
-## What it catches
+Flag	Values	Default	Description
+--tier	GREEN, BLUE, YELLOW, RED	BLUE	Analysis depth
+--format	human, json, html	human	Output format
+--output-bundle	PATH	—	Save replay bundle
+--seed	hex string	0xdeadbeef0000	Execution seed for replay
+--quiet	—	—	Suppress progress output
+Current limitations
+Python only — Java, JavaScript, Go support planned
 
-| Pattern | Risk | Example |
-|---|---|---|
-| `eval()` / `exec()` with external input | Remote code execution | `eval(request.body)` |
-| `pickle.loads()` from network | Attacker controls your server | `pickle.loads(socket.recv())` |
-| `subprocess` with `shell=True` | OS command injection | `subprocess.run(cmd, shell=True)` |
-| `random` for security tokens | Forgeable session tokens | `random.hex(32)` |
-| User-controlled file paths | Directory traversal | `open(request.args['file'])` |
-| Global state in request handlers | Data leaks between users | `global _session_store` |
+Static analysis — no runtime monitoring
 
----
+v0.1.0 — supply chain analysis and AI hallucination detection in development
 
-## Analysis tiers
+Architecture
+DCAVP is built on three architectural pillars:
 
-| Tier | Speed | Strictness | Use case |
-|---|---|---|---|
-| GREEN | Fastest | Basic | Quick check, education |
-| BLUE | Fast | Standard | CI/CD default |
-| YELLOW | Moderate | Strict | Regulated software |
-| RED | Thorough | Maximum | Safety-critical systems |
+Determinism — Same input produces identical output, always. Every analysis is reproducible.
 
----
+Zero Trust — The platform verifies itself (6/6 governance gates) before analyzing your code.
 
-## Trust Score
+Tiered Governance — GREEN warns, BLUE blocks, YELLOW investigates, RED eliminates.
 
-Every scan produces a score (0–100):
+No cloud. No telemetry. No API calls. Everything runs locally.
 
-| Score | Grade | Meaning |
-|---|---|---|
-| 90–100 | A | Ready to ship |
-| 75–89 | B | Minor issues — review recommended |
-| 60–74 | C | Warnings present — fix before production |
-| 40–59 | D | Critical issues found |
-| 0–39 | F | Do not ship |
+Contributing
+See CONTRIBUTING.md. All contributions require tests and must pass dcavp verify under RED tier.
 
----
-
-## Proof Certificate
-
-Every scan produces a cryptographic Proof Certificate — a verifiable record that you ran the analysis on a specific codebase, shareable with auditors without revealing source code.
-
-```
-certificate:b01709a9f8d5fe8d878de09ef23e87...
-commitment: commitment:c71a6442418e03a7d571f...
-trust_band: high · 91/100
-```
-
----
-
-## How it's different
-
-| Feature | DCAVP | Snyk | SonarQube |
-|---|---|---|---|
-| Deterministic results | ✅ Always | ❌ No | ❌ No |
-| Plain-English findings | ✅ Yes | Partial | Partial |
-| No external dependencies | ✅ Zero | ❌ API | ❌ Server |
-| Proof Certificate | ✅ Yes | ❌ No | ❌ No |
-| AI-generated code patterns | ✅ Yes | Partial | ❌ No |
-| Self-verification | ✅ Yes | ❌ No | ❌ No |
-
----
-
-## Current limitations
-
-- **Python only** — Java, JavaScript, Go support planned
-- **Static analysis** — no runtime monitoring
-- **Local execution** — no cloud component required (and none exists yet)
-
----
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md). All contributions require tests.
-
-## License
-
-Apache 2.0 — see [LICENSE](LICENSE).
-
----
+License
+Apache 2.0 — see LICENSE.
 
 <div align="center">
 Built for the AI-generated code era.
-</div>
+
+Website · Docs · Upgrade
+
+</div> ```

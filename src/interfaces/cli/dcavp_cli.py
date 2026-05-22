@@ -133,6 +133,10 @@ def cmd_analyze(args: argparse.Namespace) -> int:
 
         if args.format == "json":
             print(json.dumps(output, indent=2))
+        elif args.format == "html":
+            html_path = args.output_bundle or 'dcavp-report.html'
+            from src.interfaces.report.html_report import generate_html_report
+            generate_html_report(output, result, html_path)
         else:
             _print_human(output, result)
 
@@ -185,6 +189,188 @@ def _print_human(output: dict, result) -> None:
         print(f"\n  ✗ PIPELINE BLOCKED: findings exceed tier threshold")
     else:
         print(f"\n  ✓ Pipeline clear")
+
+
+def _print_html(output: dict, result, filepath: str) -> None:
+    """Generate standalone HTML report."""
+    status_color = "#22c55e" if output["status"] == "PASS" else "#ef4444"
+    status_text = output["status"]
+    tier = output["tier"]
+    tier_colors = {"GREEN": "#22c55e", "BLUE": "#3b82f6", "YELLOW": "#eab308", "RED": "#ef4444"}
+    tier_color = tier_colors.get(tier, "#6b7280")
+    
+    findings_html = ""
+    for f in output.get("findings", []):
+        sev_color = "#ef4444" if f["severity"] == "critical" else "#eab308"
+        findings_html += f"""
+        <tr>
+            <td style="color:{sev_color};font-weight:bold">{f['severity'].upper()}</td>
+            <td>{f['construct']}</td>
+            <td><code>{f['location']}</code></td>
+            <td>{f['state']}</td>
+            <td>{'⚠️ Yes' if f['human_review'] else 'No'}</td>
+        </tr>"""
+    
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCAVP Security Report — {output['source_root']}</title>
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{ font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #e2e8f0; padding: 2rem; }}
+        .container {{ max-width: 900px; margin: 0 auto; }}
+        h1 {{ color: #f8fafc; font-size: 1.8rem; margin-bottom: 0.5rem; }}
+        .subtitle {{ color: #94a3b8; margin-bottom: 2rem; }}
+        .status-badge {{ display: inline-block; padding: 0.5rem 1.5rem; border-radius: 2rem; font-weight: bold; font-size: 1.2rem; background: {status_color}; color: white; margin-bottom: 1.5rem; }}
+        .card {{ background: #1e293b; border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #334155; }}
+        .card h2 {{ color: #f1f5f9; font-size: 1.1rem; margin-bottom: 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }}
+        .grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }}
+        .metric {{ text-align: center; }}
+        .metric .value {{ font-size: 2rem; font-weight: bold; color: #f8fafc; }}
+        .metric .label {{ font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }}
+        .tier-badge {{ display: inline-block; padding: 0.25rem 0.75rem; border-radius: 1rem; font-weight: bold; font-size: 0.9rem; background: {tier_color}; color: white; }}
+        table {{ width: 100%; border-collapse: collapse; }}
+        th {{ text-align: left; color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.75rem 0.5rem; border-bottom: 1px solid #334155; }}
+        td {{ padding: 0.75rem 0.5rem; border-bottom: 1px solid #1e293b; font-size: 0.9rem; }}
+        tr:hover {{ background: #334155; }}
+        code {{ background: #0f172a; padding: 0.15rem 0.4rem; border-radius: 0.25rem; font-size: 0.85rem; }}
+        .footer {{ text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 2rem; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DCAVP Security Analysis Report</h1>
+        <p class="subtitle">Deterministic security analysis for AI-generated Python code</p>
+        <div class="status-badge">{status_text}</div>
+        
+        <div class="card">
+            <h2>Summary</h2>
+            <div class="grid">
+                <div class="metric"><div class="value"><span class="tier-badge">{tier}</span></div><div class="label">Tier</div></div>
+                <div class="metric"><div class="value">{output['files_analyzed']}</div><div class="label">Files</div></div>
+                <div class="metric"><div class="value">{output['nodes_discovered']}</div><div class="label">Nodes</div></div>
+                <div class="metric"><div class="value">{output['finding_count']}</div><div class="label">Findings</div></div>
+                <div class="metric"><div class="value">{output['honesty_score']}/1000</div><div class="label">Trust Score</div></div>
+                <div class="metric"><div class="value">{output['elapsed_ms']}ms</div><div class="label">Elapsed</div></div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Source</h2>
+            <p><code>{output['source_root']}</code></p>
+            <p style="color:#94a3b8;font-size:0.85rem;margin-top:0.5rem;">Artifact: {output['artifact_hash'][:48]}...</p>
+        </div>
+        
+        <div class="card">
+            <h2>Findings ({len(output.get('findings', []))})</h2>
+            {f'''<table>
+                <tr><th>Severity</th><th>Construct</th><th>Location</th><th>State</th><th>Human Review</th></tr>
+                {findings_html}
+            </table>''' if findings_html else '<p style="color:#22c55e;">✓ No findings — pipeline clear</p>'}
+        </div>
+        
+        <div class="footer">
+            DCAVP v0.1.0 | Trust Level: {output['trust_level']} | {'Pipeline BLOCKED' if output['pipeline_blocked'] else 'Pipeline CLEAR'}
+        </div>
+    </div>
+</body>
+</html>"""
+    
+    pathlib.Path(filepath).write_text(html, encoding='utf-8')
+    print(f"\n[DCAVP] HTML report written to: {filepath}", file=sys.stderr)
+
+
+def _print_html(output: dict, result, filepath: str) -> None:
+    """Generate standalone HTML report."""
+    status_color = "#22c55e" if output["status"] == "PASS" else "#ef4444"
+    status_text = output["status"]
+    tier = output["tier"]
+    tier_colors = {"GREEN": "#22c55e", "BLUE": "#3b82f6", "YELLOW": "#eab308", "RED": "#ef4444"}
+    tier_color = tier_colors.get(tier, "#6b7280")
+    
+    findings_html = ""
+    for f in output.get("findings", []):
+        sev_color = "#ef4444" if f["severity"] == "critical" else "#eab308"
+        findings_html += f"""
+        <tr>
+            <td style="color:{sev_color};font-weight:bold">{f['severity'].upper()}</td>
+            <td>{f['construct']}</td>
+            <td><code>{f['location']}</code></td>
+            <td>{f['state']}</td>
+            <td>{'⚠️ Yes' if f['human_review'] else 'No'}</td>
+        </tr>"""
+    
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCAVP Security Report — {output['source_root']}</title>
+    <style>
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{ font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #e2e8f0; padding: 2rem; }}
+        .container {{ max-width: 900px; margin: 0 auto; }}
+        h1 {{ color: #f8fafc; font-size: 1.8rem; margin-bottom: 0.5rem; }}
+        .subtitle {{ color: #94a3b8; margin-bottom: 2rem; }}
+        .status-badge {{ display: inline-block; padding: 0.5rem 1.5rem; border-radius: 2rem; font-weight: bold; font-size: 1.2rem; background: {status_color}; color: white; margin-bottom: 1.5rem; }}
+        .card {{ background: #1e293b; border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #334155; }}
+        .card h2 {{ color: #f1f5f9; font-size: 1.1rem; margin-bottom: 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }}
+        .grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }}
+        .metric {{ text-align: center; }}
+        .metric .value {{ font-size: 2rem; font-weight: bold; color: #f8fafc; }}
+        .metric .label {{ font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }}
+        .tier-badge {{ display: inline-block; padding: 0.25rem 0.75rem; border-radius: 1rem; font-weight: bold; font-size: 0.9rem; background: {tier_color}; color: white; }}
+        table {{ width: 100%; border-collapse: collapse; }}
+        th {{ text-align: left; color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; padding: 0.75rem 0.5rem; border-bottom: 1px solid #334155; }}
+        td {{ padding: 0.75rem 0.5rem; border-bottom: 1px solid #1e293b; font-size: 0.9rem; }}
+        tr:hover {{ background: #334155; }}
+        code {{ background: #0f172a; padding: 0.15rem 0.4rem; border-radius: 0.25rem; font-size: 0.85rem; }}
+        .footer {{ text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 2rem; }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DCAVP Security Analysis Report</h1>
+        <p class="subtitle">Deterministic security analysis for AI-generated Python code</p>
+        <div class="status-badge">{status_text}</div>
+        
+        <div class="card">
+            <h2>Summary</h2>
+            <div class="grid">
+                <div class="metric"><div class="value"><span class="tier-badge">{tier}</span></div><div class="label">Tier</div></div>
+                <div class="metric"><div class="value">{output['files_analyzed']}</div><div class="label">Files</div></div>
+                <div class="metric"><div class="value">{output['nodes_discovered']}</div><div class="label">Nodes</div></div>
+                <div class="metric"><div class="value">{output['finding_count']}</div><div class="label">Findings</div></div>
+                <div class="metric"><div class="value">{output['honesty_score']}/1000</div><div class="label">Trust Score</div></div>
+                <div class="metric"><div class="value">{output['elapsed_ms']}ms</div><div class="label">Elapsed</div></div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Source</h2>
+            <p><code>{output['source_root']}</code></p>
+            <p style="color:#94a3b8;font-size:0.85rem;margin-top:0.5rem;">Artifact: {output['artifact_hash'][:48]}...</p>
+        </div>
+        
+        <div class="card">
+            <h2>Findings ({len(output.get('findings', []))})</h2>
+            {f'''<table>
+                <tr><th>Severity</th><th>Construct</th><th>Location</th><th>State</th><th>Human Review</th></tr>
+                {findings_html}
+            </table>''' if findings_html else '<p style="color:#22c55e;">✓ No findings — pipeline clear</p>'}
+        </div>
+        
+        <div class="footer">
+            DCAVP v0.1.0 | Trust Level: {output['trust_level']} | {'Pipeline BLOCKED' if output['pipeline_blocked'] else 'Pipeline CLEAR'}
+        </div>
+    </div>
+</body>
+</html>"""
+    
+    pathlib.Path(filepath).write_text(html, encoding='utf-8')
+    print(f"\n[DCAVP] HTML report written to: {filepath}", file=sys.stderr)
     print(f"{'='*60}\n")
 
 
@@ -281,7 +467,7 @@ def main() -> int:
     p_analyze.add_argument("--seed", default="0xdeadbeef0000",
                             help="Execution seed for replay (must start with 0x)")
     p_analyze.add_argument("--format", default="human",
-                            choices=["human", "json"],
+                            choices=["human", "json", "html"],
                             help="Output format (default: human)")
     p_analyze.add_argument("--output-bundle", metavar="PATH",
                             help="Write replay bundle to this path")
