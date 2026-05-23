@@ -7,7 +7,22 @@
 
 Security analysis for AI-generated Python code.
 Find dangerous patterns before they reach production.
+> **DCAVP v0.1.0 is an early-stage deterministic security pattern extraction kernel.**
+> It detects 11 high-confidence Python security patterns. It does NOT perform dataflow
+> analysis or taint tracking. It is NOT a replacement for Bandit/Snyk — it is a
+> complement that adds determinism, self-verification, and honesty guarantees.
+> **Every result is reproducible. Every failure is admitted.**
 
+## What is ANALYSIS VACUUM?
+
+When DCAVP analyzes code that contains no registered dangerous patterns, it does NOT
+give a false "PASS". Instead, it reports **ANALYSIS VACUUM** — meaning:
+
+- ✅ "I found nothing dangerous"
+- ⚠️ "But I also didn't analyze everything"
+- 🔒 "Results should not be trusted as comprehensive"
+
+This is honesty, not failure. No other security tool does this.
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
 [![Self-Verified](https://img.shields.io/badge/self--verification-6%2F6-brightgreen.svg)](#)
