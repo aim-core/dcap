@@ -146,28 +146,29 @@ SSRF_CONSTRUCT = ConstructDefinition(
 )
 
 
-SECRET_CONSTRUCT = ConstructDefinition(
-    construct_id="CONST-SEC-009",
-    construct_name="hardcoded_secret",
+
+SQL_INJECTION_CONSTRUCT = ConstructDefinition(
+    construct_id="CONST-SEC-011",
+    construct_name="sql_injection",
     catalog_version="2026.05.12",
     language="python",
-    description="Hardcoded secrets (API keys, passwords) in source code. CWE-798.",
-    ast_node_types=("Assign",),
-    states=("hardcoded_secret",),
+    description="SQL execute() with dynamic query enables SQL injection (CWE-89).",
+    ast_node_types=("Call",),
+    states=("dynamic_query", "static_query"),
     danger_conditions=(
-        _pc._dc("DC-001", "hardcoded_secret", Severity.CRITICAL.value, Confidence.CERTAIN.value,
-            "Hardcoded secret in source code (CWE-798). Use environment variables.",
-            "AST_PATTERN", "CWE-798", cwes=("CWE-798",)),
+        _pc._dc("DC-001", "dynamic_query", Severity.CRITICAL.value, Confidence.CERTAIN.value,
+            "SQL query built with string formatting enables SQL injection (CWE-89). Use parameterized queries.",
+            "AST_PATTERN", "CWE-89", cwes=("CWE-89",)),
     ),
-    acceptance_conditions=("no_hardcoded_secrets",),
+    acceptance_conditions=("parameterized_queries_only",),
     tier_permissions=_pc._all_tiers("Warn", "Error", "Block", "CRITICAL: block", b_esc="ERROR", r_esc="CRITICAL"),
-    analysis_bounds=_pc._bounds(1, 0, 10, 5, "Pattern match"),
-    analysis_constraints=("CANNOT_DETECT_OBFUSCATED_SECRETS",),
-    risk_mappings=(_pc._rm(RiskType.CYBERSECURITY, 870, "Hardcoded secret (CWE-798)", "CWE-798"),),
+    analysis_bounds=_pc._bounds(2, 0, 10, 5, "Query tracing: 2"),
+    analysis_constraints=("CANNOT_DETECT_ORM_BASED_INJECTION",),
+    risk_mappings=(_pc._rm(RiskType.CYBERSECURITY, 960, "SQL injection (CWE-89)", "CWE-89"),),
     linked_policies=("POL-SEC-001",),
-    linked_standards=("CWE-798",),
-    knowledge_citations=(_pc._cite("CWE-798", "Hardcoded Credentials", "2024-02-29", "https://cwe.mitre.org/data/definitions/798.html"),),
-    human_review_triggers=("HARDCODED_SECRET",),
+    linked_standards=("CWE-89",),
+    knowledge_citations=(_pc._cite("CWE-89","SQL Injection","2024-02-29","https://cwe.mitre.org/data/definitions/89.html"),),
+    human_review_triggers=("SQL_INJECTION_DYNAMIC_QUERY",),
     boundary_conditions=(),
 )
 
@@ -203,6 +204,6 @@ EXTENDED_CONSTRUCTS = (
     YAML_LOAD_CONSTRUCT,
     DEBUG_TRUE_CONSTRUCT,
     SSRF_CONSTRUCT,
-    SECRET_CONSTRUCT,
     OS_REMOVE_CONSTRUCT,
+    SQL_INJECTION_CONSTRUCT,
 )

@@ -102,6 +102,8 @@ def _ej(identifier: str, rationale: str) -> KnowledgeCitation:
 
 
 _C_CWE94   = _cite("CWE-94",  "Improper Control of Generation of Code ('Code Injection')", "2024-02-29", "https://cwe.mitre.org/data/definitions/94.html")
+_C_CWE89   = _cite("CWE-89", "SQL Injection", "2024-02-29", "https://cwe.mitre.org/data/definitions/89.html")
+_C_SQLITE   = _cite("PYTHON-SQLITE", "sqlite3 execute()", "2024-01-01", "https://docs.python.org/3/library/sqlite3.html")
 _C_CWE78   = _cite("CWE-78",  "Improper Neutralization of Special Elements in an OS Command", "2024-02-29", "https://cwe.mitre.org/data/definitions/78.html")
 _C_CWE22   = _cite("CWE-22",  "Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')", "2024-02-29", "https://cwe.mitre.org/data/definitions/22.html")
 _C_CWE330  = _cite("CWE-330", "Use of Insufficiently Random Values", "2024-02-29", "https://cwe.mitre.org/data/definitions/330.html")

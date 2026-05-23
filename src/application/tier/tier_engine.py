@@ -321,10 +321,10 @@ class TierEngine:
                 all_decisions.append(decision)
             except Exception as e:
                 warnings.append(
-                    f"Policy evaluation error at {node.canonical_location}: "
-                    f"{type(e).__name__}: {e}"
+                    f"Rule execution degraded at {node.canonical_location}: "
+                    f"{type(e).__name__}. This finding was skipped. "
+                    f"Other findings are unaffected."
                 )
-
         # ── Step 5: Apply tier-level filters ─────────────────────────────
         # GREEN tier: show everything including INFO
         # BLUE+: suppress INFO findings (reduce noise)

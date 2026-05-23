@@ -492,6 +492,10 @@ class PythonParser:
             if detected:
                 results.append(detected)
 
+        elif isinstance(node, ast.Assign):
+            detected = self._detect_hardcoded_secret(node, file_path, source_root, source_lines, parent_map, tracker)
+            if detected:
+                results.append(detected)
         elif isinstance(node, ast.Global):
             detected = self._detect_global(
                 node, file_path, source_root, source_lines, tracker,
@@ -547,6 +551,8 @@ class PythonParser:
             return self._detect_debug_true(node, file_path, source_root, source_lines, parent_map, tracker)
         if call_name == "requests.get" or call_name == "requests.post":
             return self._detect_ssrf(node, file_path, source_root, source_lines, parent_map, tracker)
+        if call_name.endswith(".execute") or call_name.endswith(".executemany"):
+            return self._detect_sql_injection(node, file_path, source_root, source_lines, parent_map, tracker)
         if call_name == "os.remove" or call_name == "os.unlink":
             return self._detect_os_remove(node, file_path, source_root, source_lines, parent_map, tracker)
         if call_name == "os.system":
@@ -670,6 +676,33 @@ class PythonParser:
         src = self._source_line(node, source_lines)
         call_ctx = tracker.build_call_context(())
         return AnalyzedNode.create(loc, "CONST-SEC-008", "Call", state, call_ctx, src)
+
+    def _detect_hardcoded_secret(self, node, file_path, source_root, source_lines, parent_map, tracker):
+        loc = self._canonical_location(node, file_path, source_root)
+        secret_keywords = ["SECRET", "KEY", "PASSWORD", "PASSWD", "TOKEN", "API_KEY", "AUTH"]
+        for target in node.targets:
+            if isinstance(target, ast.Name):
+                name = target.id.upper()
+                if any(kw in name for kw in secret_keywords):
+                    if isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
+                        if len(node.value.value) > 8:
+                            src = self._source_line(node, source_lines)
+                            call_ctx = tracker.build_call_context(())
+                            return AnalyzedNode.create(loc, "CONST-SEC-012", "Assign", "hardcoded_secret", call_ctx, src)
+        return []
+
+    def _detect_sql_injection(self, node, file_path, source_root, source_lines, parent_map, tracker):
+        loc = self._canonical_location(node, file_path, source_root)
+        state = "static_query"
+        if node.args:
+            arg = node.args[0]
+            if isinstance(arg, ast.JoinedStr) or isinstance(arg, ast.BinOp):
+                state = "dynamic_query"
+            elif isinstance(arg, ast.Name):
+                state = "dynamic_query"
+        src = self._source_line(node, source_lines)
+        call_ctx = tracker.build_call_context(())
+        return AnalyzedNode.create(loc, "CONST-SEC-011", "Call", state, call_ctx, src)
 
     def _detect_os_remove(self, node, file_path, source_root, source_lines, parent_map, tracker):
         loc = self._canonical_location(node, file_path, source_root)
