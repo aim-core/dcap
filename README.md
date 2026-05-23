@@ -1,133 +1,108 @@
 
 <div align="center">
 
-# 🛡️ DCAVP
+# 🏛️ DCAVP
 
 **Deterministic Code Analysis & Verification Platform**
 
-Security analysis for AI-generated Python code.
-Find dangerous patterns before they reach production.
-> **DCAVP v0.1.0 is an early-stage deterministic security pattern extraction kernel.**
-> It detects 11 high-confidence Python security patterns. It does NOT perform dataflow
-> analysis or taint tracking. It is NOT a replacement for Bandit/Snyk — it is a
-> complement that adds determinism, self-verification, and honesty guarantees.
-> **Every result is reproducible. Every failure is admitted.**
+*The only security tool that admits when it fails.*
 
-## What is ANALYSIS VACUUM?
-
-When DCAVP analyzes code that contains no registered dangerous patterns, it does NOT
-give a false "PASS". Instead, it reports **ANALYSIS VACUUM** — meaning:
-
-- ✅ "I found nothing dangerous"
-- ⚠️ "But I also didn't analyze everything"
-- 🔒 "Results should not be trusted as comprehensive"
-
-This is honesty, not failure. No other security tool does this.
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
-[![Self-Verified](https://img.shields.io/badge/self--verification-6%2F6-brightgreen.svg)](#)
+[![Self-Verified](https://img.shields.io/badge/self--verification-6%2F6-brightgreen.svg)](SELF_VERIFICATION.md)
+[![Coverage](https://img.shields.io/badge/coverage-86%25-yellow.svg)](COVERAGE.md)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)](#)
 
 </div>
 
 ---
 
-## What it does
+## What is DCAVP?
 
-Scans your Python code for security issues that AI generators (ChatGPT, Claude, Copilot, Cursor) commonly introduce — and explains them in plain English.
+DCAVP is not a scanner. It is a **verification platform**.
+
+Most security tools give you a score. DCAVP gives you a **proof**.
+
+Most security tools hide their failures. DCAVP **admits them**.
+
+Most security tools ask for your trust. DCAVP **verifies itself** before verifying you.
+
+---
+
+## Quick Start
 
 ```bash
 pip install dcavp
-dcavp analyze ./my_project
-Quick Start
-bash
-# Basic analysis (human-readable output)
+
+# Analyze your code
 dcavp analyze ./my_project
 
-# Generate HTML report
-dcavp analyze ./my_project --format html
-
-# Generate JSON report for CI/CD
-dcavp analyze ./my_project --format json
-
-# Strict analysis (military-grade)
+# See how deep the analysis goes
 dcavp analyze ./my_project --tier RED
 
-# Run self-verification (the platform verifies itself)
+# Verify the platform itself
 dcavp verify
-Analysis Tiers
-Four tiers for every stage of the development lifecycle:
+What makes DCAVP different?
+Capability	DCAVP	Bandit	Snyk	SonarQube
+Deterministic results	✅ Always	✅ Yes	❌ No	❌ No
+Self-verification	✅ 6/6 gates	❌ No	❌ No	❌ No
+Admits analysis failure	✅ ANALYSIS VACUUM	❌ No	❌ No	❌ No
+Proof Certificate	✅ Cryptographically verifiable	❌ No	❌ No	❌ No
+Tiered governance	✅ 4 tiers	❌ No	❌ No	❌ No
+Cross-platform	✅ Win/Lin/Mac	✅ Yes	✅ Yes	✅ Yes
+Zero dependencies	✅ Stdlib only	✅ Yes	❌ API	❌ Server
+HTML reports	✅ Standalone	❌ No	✅ Yes	✅ Yes
+The Four Tiers
+DCAVP offers four analysis tiers. Each tier unlocks deeper analysis — and produces reports tailored to its audience.
 
-Tier	Speed	Strictness	Use Case
-🟢 GREEN	Fastest	Basic warnings	Education, quick checks
-🔵 BLUE	Fast	Standard	CI/CD default, teams
-🟡 YELLOW	Moderate	Industrial	Regulated software, supply chain
-🔴 RED	Thorough	Military-Grade	Aerospace, defense, safety-critical
-Each tier progressively unlocks deeper analysis. Choose the right level for your risk profile.
+Tier	Audience	Depth	Reports	Free Limit
+🟢 GREEN	Beginners, hobbyists	Basic patterns	Plain English, actionable	Unlimited*
+🔵 BLUE	Professional developers	Standard CI/CD	Technical, precise	10 analyses
+🟡 YELLOW	Companies, enterprises	Supply chain, dependencies	Executive, comprehensive	5 analyses
+🔴 RED	Defense, aerospace, medical	Military-grade	Proof Certificate, audit-ready	2 analyses
+*GREEN tier is free forever after GitHub login. Higher tiers offer limited free trials.
 
-What it catches
-Pattern	Risk	CWE
-eval() / exec()	Remote code execution	CWE-94
-subprocess with shell=True	OS command injection	CWE-78
-open() without context manager	Resource leak, path traversal	CWE-22
-Mutable global state	Data corruption, non-determinism	CWE-1108
-__import__ dynamic imports	Hidden code execution	CWE-94
-Every finding includes:
+What DCAVP Detects
+DCAVP detects 12 of 14 targeted security patterns (86% coverage). Every finding includes exact file location, CWE reference, and a recommended fix.
 
-Exact file location (file:line:column)
+<details> <summary>Click to see full detection table</summary>
+Pattern	Severity	CWE	Example
+eval()	CRITICAL	CWE-94	eval(request.body)
+exec()	CRITICAL	CWE-94	exec(user_code)
+subprocess with shell=True	CRITICAL	CWE-78	subprocess.run(cmd, shell=True)
+pickle.loads()	CRITICAL	CWE-502	pickle.loads(network_data)
+os.system()	CRITICAL	CWE-78	os.system(user_cmd)
+SQL injection	CRITICAL	CWE-89	cursor.execute(f"SELECT {user}")
+open() with user path	CRITICAL	CWE-22	open(request.args['file'])
+yaml.load()	HIGH	CWE-502	yaml.load(untrusted_data)
+requests.get() with user URL	HIGH	CWE-918	requests.get(user_url)
+os.remove() with user path	HIGH	CWE-22	os.remove(user_input)
+random for security tokens	HIGH	CWE-338	random.hex(32)
+debug=True in Flask	WARNING	CWE-489	app.run(debug=True)
+See COVERAGE.md for the complete list including what is not yet detected.
 
-Detected state (e.g., external_source_arg)
+</details>
+ANALYSIS VACUUM — The Most Honest Error in Security
+When DCAVP analyzes code that contains no registered dangerous patterns, it does NOT give a false "PASS".
 
-Plain-English explanation
-
-Recommended fix
-
-CWE reference
-
-HTML Reports
-Generate standalone, shareable security reports:
-
-bash
-dcavp analyze ./my_project --tier RED --format html
-Each HTML report includes:
-
-Trust Score with verification badges
-
-Executive Summary (files, nodes, findings, scan time)
-
-Detailed Findings with fix recommendations and CWE references
-
-Tier Comparison showing what deeper analysis unlocks
-
-Enterprise Features Preview with upgrade path
-
-Cryptographic Verification Certificate
-
-Reports are self-contained HTML files — no server, no dependencies. Share them with auditors, clients, or your team.
-
-Trust Score
-Every analysis produces a Trust Score (0–1000):
+Instead, it reports:
 
 text
-Trust: 1000/1000 ████████████████████ 100%
-✅ Analysis Integrity    ✅ Catalog Verified
-✅ Triple Replay Match   ✅ Artifact Signed
-The Trust Score reflects the honesty of the analysis itself — not your code quality. A score of 1000 means the analysis is cryptographically verifiable and reproducible.
+⚠ ANALYSIS VACUUM — Zero nodes produced.
+  This code may be safe. Or it may contain patterns
+  DCAVP cannot yet detect. We don't know. So we don't
+  pretend to know.
+No other security tool does this.
 
-Proof Certificate
-Every scan produces a cryptographic artifact:
-
-text
-Artifact Hash: sha256:3a14975bbfe73f7d0cacad7afa0b9bd12a5a11986...
-This hash uniquely identifies this exact analysis. Given the same source code, catalog version, and execution seed, anyone can reproduce the identical artifact. This is your audit trail — shareable without revealing source code.
+Why? Because a false "PASS" is more dangerous than a honest "I don't know".
 
 Self-Verification
-DCAVP verifies itself before it verifies you:
+DCAVP verifies itself before it verifies you.
 
 bash
-dcavp verify
-The platform runs 6 governance checks on its own source code under RED tier:
+$ dcavp verify
 
+Self-verification: 6/6 checks passed. RELEASE ELIGIBLE.
 Check	Purpose
 CHECK-SV-001	Catalog Merkle Integrity
 CHECK-SV-002	Policy Source References
@@ -135,11 +110,67 @@ CHECK-SV-003	Dependency Whitelist
 CHECK-SV-004	RED Tier Self-Analysis
 CHECK-SV-005	Triple Replay Validation
 CHECK-SV-006	Governance Gates
-6/6 must pass. A platform that cannot verify itself cannot verify other software.
+A platform that cannot verify itself cannot verify other software. DCAVP verifies itself under the strictest RED tier on every commit.
 
+See SELF_VERIFICATION.md for the latest report.
+
+Determinism — Same Input = Same Output, Always
+DCAVP produces byte-identical results for the same codebase, regardless of:
+
+Operating system (Windows, Linux, macOS)
+
+Time of day
+
+Machine it runs on
+
+This is proven via Triple Replay Validation — three independent runs must produce identical artifact hashes.
+
+text
+Run 1: sha256:a1b2c3d4...
+Run 2: sha256:a1b2c3d4...  ← identical
+Run 3: sha256:a1b2c3d4...  ← identical
+Proof Certificate
+Every analysis produces a cryptographically verifiable Proof Certificate:
+
+json
+{
+  "artifact_hash": "sha256:a1b2c3d4e5f6...",
+  "catalog_version": "2026.05.12",
+  "tier": "RED",
+  "triple_replay": "VERIFIED",
+  "self_verification": "6/6 PASSED"
+}
+Share this with auditors. It proves:
+
+What was analyzed
+
+When it was analyzed
+
+Which rules were applied
+
+That the platform was verified before analysis
+
+No source code is revealed. Only the cryptographic proof.
+
+Installation
+bash
+pip install dcavp
+Requires Python 3.12+. Zero external dependencies. The entire platform runs on Python standard library.
+
+Commands
+bash
+dcavp analyze <path>     # Analyze a project
+dcavp verify             # Self-verification
+dcavp catalog            # Show detection catalog
+dcavp login              # GitHub authentication
+Flag	Values	Description
+--tier	GREEN, BLUE, YELLOW, RED	Analysis depth
+--format	human, json, html	Output format
+--output-bundle	PATH	Save replay bundle
+--quiet	—	Suppress progress
 GitHub Actions
 yaml
-name: DCAVP Security Scan
+name: DCAVP Security Gate
 on: [push, pull_request]
 
 jobs:
@@ -151,68 +182,48 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install dcavp
-      - run: dcavp analyze . --tier RED --format html
+      - run: dcavp analyze . --tier BLUE --format html
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: security-report
           path: dcavp-report.html
-How it's different
-Feature	DCAVP	Snyk	SonarQube	Bandit
-Deterministic results	✅ Always	❌ No	❌ No	✅ Yes
-Plain-English findings	✅ Yes	Partial	Partial	❌ No
-Self-verification	✅ 6/6 Gates	❌ No	❌ No	❌ No
-Proof Certificate	✅ Yes	❌ No	❌ No	❌ No
-AI code patterns	✅ Yes	Partial	❌ No	❌ No
-Cross-platform	✅ Win/Lin/Mac	✅ Yes	✅ Yes	✅ Yes
-Zero dependencies	✅ Stdlib only	❌ API	❌ Server	✅ Yes
-Tiered governance	✅ 4 Tiers	❌ No	❌ No	❌ No
-HTML reports	✅ Standalone	✅ Yes	✅ Yes	❌ No
-Install
-bash
-pip install dcavp
-Requires Python 3.12+. No external dependencies. The entire platform runs on Python standard library.
+Current Limitations — Honest Disclosure
+Limitation	Status
+Hardcoded secrets detection	🚧 v0.4.0
+Exception swallowing detection	🚧 v0.4.0
+Dataflow / taint analysis	📅 v0.5.0
+Framework awareness (Flask, Django, FastAPI)	📅 v0.6.0
+Interprocedural analysis	📅 v1.0.0
+DCAVP does not claim to be a complete security solution. It claims to be a deterministic, self-verifying, honest analysis kernel. We tell you what we can see — and what we cannot.
 
-Commands
-bash
-dcavp analyze <path>     # Run security analysis
-dcavp verify             # Run self-verification
-dcavp catalog            # Show catalog information
-Options for analyze:
+Roadmap
+Version	Milestone
+v0.2.0 ✅	12 patterns, 86% coverage, ANALYSIS VACUUM
+v0.4.0 🚧	100% coverage, Severity model, Engine health
+v0.5.0 📅	Taint awareness, Context tags
+v0.6.0 📅	Framework awareness (Flask, Django)
+v1.0.0 📅	Dataflow engine, Dashboard, Enterprise ready
+Philosophy
+DCAVP is built on three principles:
 
-Flag	Values	Default	Description
---tier	GREEN, BLUE, YELLOW, RED	BLUE	Analysis depth
---format	human, json, html	human	Output format
---output-bundle	PATH	—	Save replay bundle
---seed	hex string	0xdeadbeef0000	Execution seed for replay
---quiet	—	—	Suppress progress output
-Current limitations
-Python only — Java, JavaScript, Go support planned
+Determinism — Same input produces identical output. Always.
 
-Static analysis — no runtime monitoring
+Honesty — We admit what we cannot see. ANALYSIS VACUUM is our promise.
 
-v0.1.0 — supply chain analysis and AI hallucination detection in development
+Self-Governance — We verify ourselves before we verify you. 6/6 or nothing.
 
-Architecture
-DCAVP is built on three architectural pillars:
-
-Determinism — Same input produces identical output, always. Every analysis is reproducible.
-
-Zero Trust — The platform verifies itself (6/6 governance gates) before analyzing your code.
-
-Tiered Governance — GREEN warns, BLUE blocks, YELLOW investigates, RED eliminates.
-
-No cloud. No telemetry. No API calls. Everything runs locally.
+No cloud. No telemetry. No API calls. Everything runs locally. Your code never leaves your machine.
 
 Contributing
-See CONTRIBUTING.md. All contributions require tests and must pass dcavp verify under RED tier.
+See CONTRIBUTING.md. All contributions must pass dcavp verify under RED tier.
 
 License
 Apache 2.0 — see LICENSE.
 
 <div align="center">
-Built for the AI-generated code era.
+DCAVP — Because a tool that cannot verify itself cannot verify you.
 
-Website · Docs · Upgrade
+Website · Docs · Coverage · Self-Verification
 
 </div> ```
