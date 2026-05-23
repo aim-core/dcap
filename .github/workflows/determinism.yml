@@ -1,0 +1,111 @@
+name: Determinism Proof
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install DCAVP
+        run: pip install -e .
+      - name: Self-Verification
+        run: dcavp verify
+      - name: Analyze Test Project
+        run: |
+          mkdir -p /tmp/test_project
+          echo "eval('test')" > /tmp/test_project/bad.py
+          dcavp analyze /tmp/test_project --tier RED --format json > linux-result.json
+      - name: Upload Result
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-result
+          path: linux-result.json
+
+  verify-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install DCAVP
+        run: pip install -e .
+      - name: Self-Verification
+        run: dcavp verify
+      - name: Analyze Test Project
+        run: |
+          mkdir C:\test_project
+          echo eval('test') > C:\test_project\bad.py
+          dcavp analyze C:\test_project --tier RED --format json > windows-result.json
+      - name: Upload Result
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-result
+          path: windows-result.json
+
+  verify-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install DCAVP
+        run: pip install -e .
+      - name: Self-Verification
+        run: dcavp verify
+      - name: Analyze Test Project
+        run: |
+          mkdir -p /tmp/test_project
+          echo "eval('test')" > /tmp/test_project/bad.py
+          dcavp analyze /tmp/test_project --tier RED --format json > macos-result.json
+      - name: Upload Result
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-result
+          path: macos-result.json
+
+  compare-results:
+    needs: [verify-linux, verify-windows, verify-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-result
+          path: results/linux
+      - uses: actions/download-artifact@v4
+        with:
+          name: windows-result
+          path: results/windows
+      - uses: actions/download-artifact@v4
+        with:
+          name: macos-result
+          path: results/macos
+      - name: Compare Artifact Hashes
+        run: |
+          echo "=== LINUX ===" && cat results/linux/linux-result.json | python3 -c "import sys,json; print(json.load(sys.stdin)['artifact_hash'])"
+          echo "=== WINDOWS ===" && cat results/windows/windows-result.json | python3 -c "import sys,json; print(json.load(sys.stdin)['artifact_hash'])"
+          echo "=== MACOS ===" && cat results/macos/macos-result.json | python3 -c "import sys,json; print(json.load(sys.stdin)['artifact_hash'])"
+          LINUX_HASH=$(cat results/linux/linux-result.json | python3 -c "import sys,json; print(json.load(sys.stdin)['artifact_hash'])")
+          WINDOWS_HASH=$(cat results/windows/windows-result.json | python3 -c "import sys,json; print(json.load(sys.stdin)['artifact_hash'])")
+          MACOS_HASH=$(cat results/macos/macos-result.json | python3 -c "import sys,json; print(json.load(sys.stdin)['artifact_hash'])")
+          if [ "$LINUX_HASH" = "$WINDOWS_HASH" ] && [ "$WINDOWS_HASH" = "$MACOS_HASH" ]; then
+            echo ""
+            echo "✅ DETERMINISM PROVED: All 3 platforms produced identical artifact hashes."
+            echo "   Hash: $LINUX_HASH"
+          else
+            echo ""
+            echo "❌ DETERMINISM FAILED: Artifact hashes differ across platforms."
+            echo "   Linux:   $LINUX_HASH"
+            echo "   Windows: $WINDOWS_HASH"
+            echo "   macOS:   $MACOS_HASH"
+            exit 1
+          fi
