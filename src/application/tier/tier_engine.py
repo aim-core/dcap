@@ -292,6 +292,19 @@ class TierEngine:
             all_nodes.extend(pr.nodes)
             warnings.extend(pr.parse_warnings)
 
+        # ── Invariant: Analysis Vacuum Detection ──────────────────────────
+        # If files were analyzed but zero nodes extracted, the analysis
+        # is INVALID - not clean. Trust must degrade immediately.
+        if files_analyzed > 0 and len(all_nodes) == 0:
+            warnings.append(
+                "CRITICAL: Analysis produced zero nodes across "
+                f"{files_analyzed} analyzed file(s). "
+                "This is an ANALYSIS VACUUM - results cannot be trusted. "
+                "Possible causes: no registered constructs match this code, "
+                "parser returned empty nodes, or file contains only "
+                "definitions (classes, functions, constants) without calls."
+            )
+
         # ── Step 3: Enforce LOC quota ─────────────────────────────────────
         total_loc = sum(pr.line_count for pr in parse_results)
         if total_loc > profile.max_loc:
@@ -356,6 +369,19 @@ class TierEngine:
         block_threshold = sev_order.get(profile.pipeline_blocking_severity, 999)
 
         pipeline_blocked = False
+
+        # ── GREEN Security Floor: CRITICAL findings ALWAYS block ──────────
+        # Even in GREEN tier (warnings only), CRITICAL severity findings
+        # (eval, exec, pickle, subprocess) block the pipeline.
+        # GREEN warns on lesser issues but never passes code with RCE vectors.
+        if tier == Tier.GREEN:
+            critical_count = sum(
+                1 for d in all_decisions
+                if d.finding and d.finding.severity == S.CRITICAL.value
+                and not d.is_suppressed
+            )
+            if critical_count > 0:
+                pipeline_blocked = True
         requires_dual    = False
 
         for d in all_decisions:
@@ -368,6 +394,11 @@ class TierEngine:
                 if finding_level >= block_threshold and block_threshold < 999:
                     pipeline_blocked = True
 
+        # Invariant: Analysis Vacuum overrides pipeline status
+        if files_analyzed > 0 and len(all_nodes) == 0:
+            pipeline_blocked = True
+            requires_dual = True
+            vacuum_blocked = True
         elapsed_ms = (time.monotonic_ns() - t0_ns) // 1_000_000
 
         return TierAnalysisResult(

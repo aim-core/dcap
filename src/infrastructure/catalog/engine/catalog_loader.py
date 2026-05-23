@@ -69,6 +69,7 @@ from src.infrastructure.catalog.entries.python.eval_construct import (
 from src.infrastructure.catalog.entries.python.python_constructs import (
     ALL_PYTHON_CONSTRUCTS,
 )
+from src.infrastructure.catalog.entries.python.constructs_extended import EXTENDED_CONSTRUCTS
 
 
 # ─── Error Types ──────────────────────────────────────────────────────────────
@@ -126,7 +127,7 @@ def load_python_catalog(catalog_version: str = CURRENT_CATALOG_VERSION) -> Catal
         ) from e
 
     # ── Step 3: Register all Phase 2 Python constructs ─────────────────────
-    for construct in ALL_PYTHON_CONSTRUCTS:
+    for construct in list(ALL_PYTHON_CONSTRUCTS) + list(EXTENDED_CONSTRUCTS):
         try:
             builder.register(construct)
         except Exception as e:

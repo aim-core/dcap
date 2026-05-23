@@ -109,6 +109,7 @@ class Phase0ValidationReport:
 KERNEL_FORBIDDEN_IMPORTS: frozenset[str] = frozenset({
     "random",
     "subprocess",
+    "os",        # os.system, os.popen
     "multiprocessing",
     "threading",
     "asyncio",

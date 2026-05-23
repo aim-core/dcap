@@ -534,8 +534,26 @@ class PythonParser:
     ) -> Optional[AnalyzedNode]:
         """Dispatch to the correct construct detector for a Call node."""
         call_name = _get_call_name(node)
+        if call_name == "yaml.load":
+            return self._detect_yaml_load(node, file_path, source_root, source_lines, parent_map, tracker)
+        if call_name == "app.run":
+            return self._detect_debug_true(node, file_path, source_root, source_lines, parent_map, tracker)
+        # if call_name == "app.run":  # DISABLEDnode, file_path, source_root, source_lines, parent_map, tracker)
+        if call_name == "yaml.load":
+            return self._detect_yaml_load(node, file_path, source_root, source_lines, parent_map, tracker)
+        if call_name == "yaml.load":
+            return self._detect_yaml_load(node, file_path, source_root, source_lines, parent_map, tracker)
+        if call_name == "app.run":
+            return self._detect_debug_true(node, file_path, source_root, source_lines, parent_map, tracker)
+        if call_name == "requests.get" or call_name == "requests.post":
+            return self._detect_ssrf(node, file_path, source_root, source_lines, parent_map, tracker)
+        if call_name == "os.remove" or call_name == "os.unlink":
+            return self._detect_os_remove(node, file_path, source_root, source_lines, parent_map, tracker)
+        if call_name == "os.system":
+            return self._detect_os_system(node, file_path, source_root, source_lines, parent_map, tracker)
         if not call_name:
             return None
+            return self._detect_os_system(node, file_path, source_root, source_lines, parent_map, tracker)
 
         loc = self._canonical_location(node, file_path, source_root)
         src = self._source_line(node, source_lines)
@@ -601,6 +619,81 @@ class PythonParser:
 
         call_ctx = tracker.build_call_context(sources)
         return AnalyzedNode.create(loc, construct_id, "Call", state, call_ctx, src)
+
+    def _detect_debug_true(self, node, file_path, source_root, source_lines, parent_map, tracker):
+        loc = self._canonical_location(node, file_path, source_root)
+        for kw in node.keywords:
+            if kw.arg == "debug" and isinstance(kw.value, ast.Constant) and kw.value.value == True:
+                src = self._source_line(node, source_lines)
+                call_ctx = tracker.build_call_context(())
+                return AnalyzedNode.create(loc, "CONST-SEC-007", "Call", "debug_enabled", call_ctx, src)
+        return []
+
+    def _detect_yaml_load(self, node, file_path, source_root, source_lines, parent_map, tracker):
+        loc = self._canonical_location(node, file_path, source_root)
+        state = "default_loader"
+        for kw in node.keywords:
+            if kw.arg == "Loader":
+                if isinstance(kw.value, ast.Attribute) and "SafeLoader" in str(kw.value.attr):
+                    state = "safe_loader"
+                    return []
+        src = self._source_line(node, source_lines)
+        call_ctx = tracker.build_call_context(())
+        return AnalyzedNode.create(loc, "CONST-SEC-006", "Call", state, call_ctx, src)
+
+    def _detect_yaml_load(self, node, file_path, source_root, source_lines, parent_map, tracker):
+        loc = self._canonical_location(node, file_path, source_root)
+        state = "default_loader"
+        for kw in node.keywords:
+            if kw.arg == "Loader" and isinstance(kw.value, ast.Attribute):
+                if "SafeLoader" in str(kw.value.attr):
+                    return []
+        src = self._source_line(node, source_lines)
+        call_ctx = tracker.build_call_context(())
+        return AnalyzedNode.create(loc, "CONST-SEC-006", "Call", state, call_ctx, src)
+
+    def _detect_debug_true(self, node, file_path, source_root, source_lines, parent_map, tracker):
+        loc = self._canonical_location(node, file_path, source_root)
+        for kw in node.keywords:
+            if kw.arg == "debug" and isinstance(kw.value, ast.Constant) and kw.value.value == True:
+                src = self._source_line(node, source_lines)
+                call_ctx = tracker.build_call_context(())
+                return AnalyzedNode.create(loc, "CONST-SEC-007", "Call", "debug_enabled", call_ctx, src)
+        return []
+
+    def _detect_ssrf(self, node, file_path, source_root, source_lines, parent_map, tracker):
+        loc = self._canonical_location(node, file_path, source_root)
+        args = node.args
+        state = "static_url"
+        if args and not isinstance(args[0], ast.Constant):
+            state = "user_controlled_url"
+        src = self._source_line(node, source_lines)
+        call_ctx = tracker.build_call_context(())
+        return AnalyzedNode.create(loc, "CONST-SEC-008", "Call", state, call_ctx, src)
+
+    def _detect_os_remove(self, node, file_path, source_root, source_lines, parent_map, tracker):
+        loc = self._canonical_location(node, file_path, source_root)
+        state = "static_path"
+        if node.args and not isinstance(node.args[0], ast.Constant):
+            state = "dynamic_path"
+        src = self._source_line(node, source_lines)
+        call_ctx = tracker.build_call_context(())
+        return AnalyzedNode.create(loc, "CONST-SEC-010", "Call", state, call_ctx, src)
+
+    def _detect_os_system(self, node, file_path, source_root, source_lines, parent_map, tracker):
+        loc = self._canonical_location(node, file_path, source_root)
+        args = node.args
+        if args:
+            first_arg = args[0]
+            if isinstance(first_arg, ast.Constant):
+                state = "constant_cmd"
+            else:
+                state = "dynamic_cmd"
+        else:
+            state = "dynamic_cmd"
+        src = self._source_line(node, source_lines)
+        call_ctx = tracker.build_call_context(())
+        return AnalyzedNode.create(loc, "CONST-SEC-002", "Call", state, call_ctx, src)
 
     def _detect_open(
         self, node: ast.Call, loc: str, src: str,

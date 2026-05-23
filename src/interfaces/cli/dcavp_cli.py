@@ -166,7 +166,7 @@ def _print_human(output: dict, result) -> None:
     print(f"  Files          : {output['files_analyzed']}")
     print(f"  Nodes          : {output['nodes_discovered']}")
     print(f"  Findings       : {output['finding_count']}")
-    print(f"  Trust          : {output['trust_level']} ({output['honesty_score']}/1000)")
+    print(f"  Analysis Conf.: {output['trust_level']} ({output['honesty_score']}/1000)")
     print(f"  Elapsed        : {output['elapsed_ms']}ms")
     print(f"  Artifact hash  : {output['artifact_hash'][:48]}...")
 
@@ -185,10 +185,17 @@ def _print_human(output: dict, result) -> None:
         for w in output["warnings"]:
             print(f"    ⚠ {w[:80]}")
 
-    if output["pipeline_blocked"]:
-        print(f"\n  ✗ PIPELINE BLOCKED: findings exceed tier threshold")
+    if output['pipeline_blocked']:
+            has_nodes = output.get("nodes_discovered", 0) > 0
+            has_findings = output.get("finding_count", 0) > 0
+            if not has_nodes:
+                print(f"\n  ✗ PIPELINE BLOCKED: ANALYSIS VACUUM - zero nodes produced")
+            elif has_findings:
+                print(f"\n  ✗ PIPELINE BLOCKED: CRITICAL findings exceed tier threshold")
+            else:
+                print(f"\n  ✗ PIPELINE BLOCKED: governance or integrity check failed")
     else:
-        print(f"\n  ✓ Pipeline clear")
+            print(f"\n  ✓ Pipeline clear")
 
 
 def _print_html(output: dict, result, filepath: str) -> None:
@@ -252,7 +259,7 @@ def _print_html(output: dict, result, filepath: str) -> None:
                 <div class="metric"><div class="value">{output['files_analyzed']}</div><div class="label">Files</div></div>
                 <div class="metric"><div class="value">{output['nodes_discovered']}</div><div class="label">Nodes</div></div>
                 <div class="metric"><div class="value">{output['finding_count']}</div><div class="label">Findings</div></div>
-                <div class="metric"><div class="value">{output['honesty_score']}/1000</div><div class="label">Trust Score</div></div>
+                <div class="metric"><div class="value">{output['honesty_score']}/1000</div><div class="label">Analysis Confidence</div></div>
                 <div class="metric"><div class="value">{output['elapsed_ms']}ms</div><div class="label">Elapsed</div></div>
             </div>
         </div>
@@ -272,7 +279,7 @@ def _print_html(output: dict, result, filepath: str) -> None:
         </div>
         
         <div class="footer">
-            DCAVP v0.1.0 | Trust Level: {output['trust_level']} | {'Pipeline BLOCKED' if output['pipeline_blocked'] else 'Pipeline CLEAR'}
+            DCAVP v0.1.0 | Confidence: {output['trust_level']} | {'Pipeline BLOCKED' if output['pipeline_blocked'] else 'Pipeline CLEAR'}
         </div>
     </div>
 </body>
@@ -343,7 +350,7 @@ def _print_html(output: dict, result, filepath: str) -> None:
                 <div class="metric"><div class="value">{output['files_analyzed']}</div><div class="label">Files</div></div>
                 <div class="metric"><div class="value">{output['nodes_discovered']}</div><div class="label">Nodes</div></div>
                 <div class="metric"><div class="value">{output['finding_count']}</div><div class="label">Findings</div></div>
-                <div class="metric"><div class="value">{output['honesty_score']}/1000</div><div class="label">Trust Score</div></div>
+                <div class="metric"><div class="value">{output['honesty_score']}/1000</div><div class="label">Analysis Confidence</div></div>
                 <div class="metric"><div class="value">{output['elapsed_ms']}ms</div><div class="label">Elapsed</div></div>
             </div>
         </div>
@@ -363,7 +370,7 @@ def _print_html(output: dict, result, filepath: str) -> None:
         </div>
         
         <div class="footer">
-            DCAVP v0.1.0 | Trust Level: {output['trust_level']} | {'Pipeline BLOCKED' if output['pipeline_blocked'] else 'Pipeline CLEAR'}
+            DCAVP v0.1.0 | Confidence: {output['trust_level']} | {'Pipeline BLOCKED' if output['pipeline_blocked'] else 'Pipeline CLEAR'}
         </div>
     </div>
 </body>
