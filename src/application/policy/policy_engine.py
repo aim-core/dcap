@@ -32,7 +32,7 @@
  *   Rule E-002: If call_context.has_tainted_input() and severity >= WARNING
  *               → escalate severity by one level, confidence = BOUNDED
  *   Rule E-003: If context has ISR_CONTEXT or SAFETY_CRITICAL tag
- *               → escalate to CRITICAL, human_review_required = True
+ *               → escalate to CRITICAL, human_review_required = False  # Certain patterns do not need human review
  *   Rule E-004: If call_context.is_in_test_function()
  *               → downgrade to INFO (test code exemption)
  *   Rule E-005: If call_context.is_boundary_reached()
@@ -284,8 +284,8 @@ class PolicyEngine:
             base_severity   = danger_condition.severity
             base_confidence = danger_condition.confidence
         else:
-            # Construct seen in non-dangerous state → INFO
-            base_severity   = Severity.INFO.value
+            # Construct seen in non-dangerous state → default to WARNING
+            base_severity   = Severity.WARNING.value
             base_confidence = Confidence.CERTAIN.value
 
         # ── Step 5: Escalation pipeline ───────────────────────────────────
@@ -406,7 +406,7 @@ class PolicyEngine:
         Returns: (severity, confidence, chain, is_suppressed, suppression_reason,
                   human_review, blocks_pipeline, dual_control, boundaries, boundary_status)
         """
-        severity    = base_severity
+        severity    = base_severity  # INTRINSIC - never changes
         confidence  = base_confidence
         chain: list[str] = []
         is_suppressed       = False

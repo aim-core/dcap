@@ -156,7 +156,7 @@ def cmd_analyze(args: argparse.Namespace) -> int:
 
 def _print_human(output: dict, result) -> None:
     """Human-readable analysis output."""
-    status_sym = "✓" if output["status"] == "PASS" else "✗"
+    status_sym = "OK" if output["status"] == "PASS" else "X"
     print(f"\n{'='*60}")
     print(f"  DCAVP Analysis Report")
     print(f"{'='*60}")
@@ -189,13 +189,13 @@ def _print_human(output: dict, result) -> None:
             has_nodes = output.get("nodes_discovered", 0) > 0
             has_findings = output.get("finding_count", 0) > 0
             if not has_nodes:
-                print(f"\n  ✗ PIPELINE BLOCKED: ANALYSIS VACUUM - zero nodes produced")
+                print(f"\n  X PIPELINE BLOCKED: ANALYSIS VACUUM - zero nodes produced")
             elif has_findings:
-                print(f"\n  ✗ PIPELINE BLOCKED: CRITICAL findings exceed tier threshold")
+                print(f"\n  X PIPELINE BLOCKED: CRITICAL findings exceed tier threshold")
             else:
-                print(f"\n  ✗ PIPELINE BLOCKED: governance or integrity check failed")
+                print(f"\n  X PIPELINE BLOCKED: governance or integrity check failed")
     else:
-            print(f"\n  ✓ Pipeline clear")
+            print(f"\n  OK Pipeline clear")
 
 
 def _print_html(output: dict, result, filepath: str) -> None:
@@ -275,7 +275,7 @@ def _print_html(output: dict, result, filepath: str) -> None:
             {f'''<table>
                 <tr><th>Severity</th><th>Construct</th><th>Location</th><th>State</th><th>Human Review</th></tr>
                 {findings_html}
-            </table>''' if findings_html else '<p style="color:#22c55e;">✓ No findings — pipeline clear</p>'}
+            </table>''' if findings_html else '<p style="color:#22c55e;">OK No findings — pipeline clear</p>'}
         </div>
         
         <div class="footer">
@@ -366,7 +366,7 @@ def _print_html(output: dict, result, filepath: str) -> None:
             {f'''<table>
                 <tr><th>Severity</th><th>Construct</th><th>Location</th><th>State</th><th>Human Review</th></tr>
                 {findings_html}
-            </table>''' if findings_html else '<p style="color:#22c55e;">✓ No findings — pipeline clear</p>'}
+            </table>''' if findings_html else '<p style="color:#22c55e;">OK No findings — pipeline clear</p>'}
         </div>
         
         <div class="footer">
@@ -403,7 +403,7 @@ def cmd_verify(args: argparse.Namespace) -> int:
         print(f"  Checks     : {report.checks_passed}/{len(report.checks)} passed")
         print()
         for c in report.checks:
-            sym = "✓" if c.passed else "✗"
+            sym = "OK" if c.passed else "X"
             print(f"  [{sym}] {c.check_id}: {c.check_name}")
             if not c.passed:
                 print(f"       → {c.diagnostic}")
@@ -438,7 +438,7 @@ def cmd_catalog(args: argparse.Namespace) -> int:
         print(f"  Languages  : {summary['languages']}")
         print(f"  Merkle     : {summary['merkle_root'][:40]}...")
         print(f"  Signature  : {summary['signature']}")
-        print(f"  Integrity  : {'✓ VERIFIED' if is_valid else '✗ FAILED'}")
+        print(f"  Integrity  : {'OK VERIFIED' if is_valid else 'X FAILED'}")
         print()
         print("  Constructs:")
         for lang in sorted(catalog.list_languages()):

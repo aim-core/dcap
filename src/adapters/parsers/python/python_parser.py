@@ -737,7 +737,7 @@ class PythonParser:
 
         # Determine state — priority: path_traversal > not_as_cm > used_as_cm
         if _is_tainted(sources):
-            state = "path_traversal_possible"
+            state = "path_traversal_possible"  # Only flagged when tainted input detected
         elif _is_inside_with(node, parent_map):
             state = "used_as_context_manager"
         else:

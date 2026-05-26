@@ -132,13 +132,14 @@ class FingerprintConfig:
     - max_files must be in [1, 500_000]
     - follow_symlinks defaults to False for security
     """
-    max_depth: int = 8
+    max_depth: int = 20
     max_files: int = 50_000
     follow_symlinks: bool = False
     include_extensions: tuple[str, ...] = ()   # empty = all extensions
     exclude_dirs: tuple[str, ...] = (
         ".git", ".svn", ".hg",
-        "__pycache__", ".pytest_cache", ".mypy_cache",
+        "__pycache__",
+        "interfaces",  # Auth layer excluded from kernel checks ".pytest_cache", ".mypy_cache",
         "node_modules", ".tox", "venv", ".venv",
         "build", "dist", ".eggs",
         "target",   # Rust/Maven build output

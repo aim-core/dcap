@@ -134,7 +134,7 @@ body{{font-family:'Segoe UI',system-ui,sans-serif;background:#0f172a;color:#e2e8
 <div class="status-pill">{status_emoji} — {status_text}</div><p class="status-desc">{status_desc}</p>
 <p style="color:#64748b;font-size:0.85rem;margin-top:0.5rem">Analysis: {datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}</p></div>
 
-<div class="card"><h2>Trust Score</h2>
+<div class="card"><h2>Security Risk</h2>
 <div style="text-align:center;font-size:3rem;font-weight:bold;color:#22c55e">{output['honesty_score']}/1000</div>
 <div class="trust-bar"><div class="trust-fill" style="width:{output['honesty_score']/10}%"></div></div>
 <div style="display:flex;justify-content:center;gap:2rem;margin-top:1rem;flex-wrap:wrap">
@@ -151,7 +151,7 @@ body{{font-family:'Segoe UI',system-ui,sans-serif;background:#0f172a;color:#e2e8
 <div class="metric"><div class="value">{output['nodes_discovered']}</div><div class="label">Nodes</div></div>
 <div class="metric"><div class="value" style="color:{status_color}">{output['finding_count']}</div><div class="label">Findings</div></div>
 <div class="metric"><div class="value" style="font-size:1.2rem">{output['elapsed_ms']}ms</div><div class="label">Scan Time</div></div>
-<div class="metric"><div class="value" style="font-size:1.2rem">{output['trust_level']}</div><div class="label">Trust Level</div></div></div>
+<div class="metric"><div class="value" style="font-size:1.2rem">{output['trust_level']}</div><div class="label">Analysis Integrity</div></div></div>
 <div style="margin-top:1rem;color:#94a3b8;font-size:0.9rem"><strong>Source:</strong> <code>{output['source_root']}</code></div></div>
 
 <div class="card"><h2>Findings ({len(findings)})</h2>

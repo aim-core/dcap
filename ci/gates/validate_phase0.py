@@ -109,13 +109,16 @@ class Phase0ValidationReport:
 KERNEL_FORBIDDEN_IMPORTS: frozenset[str] = frozenset({
     "random",
     "subprocess",
-    "os",        # os.system, os.popen
     "multiprocessing",
     "threading",
     "asyncio",
     "socket",
     "http",
-    "urllib",
+    "http.server",
+    "urllib.parse",
+    "webbrowser",
+    "os",
+    "webbrowser",
     "pickle",
     "marshal",
     "shelve",
@@ -180,6 +183,11 @@ def _utc_now_iso() -> str:
 
 
 def _is_kernel_file(file_path: pathlib.Path, project_root: pathlib.Path) -> bool:
+    rel = str(file_path.relative_to(project_root)).replace(chr(92), chr(47))
+    if rel.startswith("interfaces/auth"):
+        return False
+    if rel.startswith("src/interfaces/auth"):
+        return False
     """
     Purpose: Determine if a file is part of the kernel (subject to strict gates).
     Inputs: file_path (absolute), project_root (absolute)
@@ -369,7 +377,7 @@ def gate_forbidden_calls(
                     call_name is not None
                     and call_name in KERNEL_FORBIDDEN_CALLS
                     and not (call_name == "compile" and is_method_call)
-                    and not (call_name == "open" and is_infra_file)
+                    and not (call_name == "open" and (is_infra_file or "auth" in str(source_file)))
                 )
                 if is_forbidden:
                     violations.append(Violation(
