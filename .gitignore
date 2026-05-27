@@ -4,3 +4,28 @@ _*.py
 dcavp-report.html 
 interfaces/auth/github_auth.py 
 compiled_extended.pyd 
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+
+# Secrets / proprietary
+compiled_extended.pyd
+constructs_extended_backup.py
+
+# Internal experimental
+internal/
+private/
+
+# OS
+Thumbs.db
+.DS_Store

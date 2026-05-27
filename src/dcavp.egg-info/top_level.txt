@@ -1,6 +1,0 @@
-adapters
-application
-domain
-infrastructure
-interfaces
-verification
