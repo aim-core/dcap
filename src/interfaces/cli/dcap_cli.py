@@ -1,17 +1,17 @@
 """
 ******************************************************************************
- * FILE:        /src/interfaces/cli/dcavp_cli.py
+ * FILE:        /src/interfaces/cli/dcap_cli.py
  * LAYER:       Interfaces Layer
  * MODULE:      CLI Interface
- * PURPOSE:     Command-line entry point for DCAVP analysis
+ * PURPOSE:     Command-line entry point for DCAP analysis
  * DOMAIN:      Interfaces
- * AUTHOR:      DCAVP Engineering System
+ * AUTHOR:      DCAP Engineering System
  * CREATED:     2026-05-13
  * UPDATED:     2026-05-13
  * VERSION:     v0.1.0
  *
  * DESCRIPTION:
- * The DCAVP CLI provides four commands:
+ * The DCAP CLI provides four commands:
  *
  *   analyze    — Run analysis on a source tree
  *   verify     — Run self-verification gateway
@@ -69,24 +69,24 @@ def cmd_analyze(args: argparse.Namespace) -> int:
 
         # Load catalog
         if not args.quiet:
-            print(f"[DCAVP] Loading catalog...", file=sys.stderr)
+            print(f"[DCAP] Loading catalog...", file=sys.stderr)
         catalog = load_python_catalog()
 
         # Classify project
         if not args.quiet:
-            print(f"[DCAVP] Classifying project...", file=sys.stderr)
+            print(f"[DCAP] Classifying project...", file=sys.stderr)
         pipeline = ClassificationPipeline()
         classification = pipeline.classify(args.source_root)
         fp = classification.fingerprint
 
         if not args.quiet:
-            print(f"[DCAVP] Project: {fp.domain_posture} | "
+            print(f"[DCAP] Project: {fp.domain_posture} | "
                   f"Tier: {tier.value} | "
                   f"Language: {fp.language}", file=sys.stderr)
 
         # Run analysis
         if not args.quiet:
-            print(f"[DCAVP] Analyzing...", file=sys.stderr)
+            print(f"[DCAP] Analyzing...", file=sys.stderr)
         engine = TierEngine(catalog)
         result = engine.analyze(
             source_root=args.source_root,
@@ -134,7 +134,7 @@ def cmd_analyze(args: argparse.Namespace) -> int:
         if args.format == "json":
             print(json.dumps(output, indent=2))
         elif args.format == "html":
-            html_path = args.output_bundle or 'dcavp-report.html'
+            html_path = args.output_bundle or 'dcap-report.html'
             from src.interfaces.report.html_report import generate_html_report
             generate_html_report(output, result, html_path)
         else:
@@ -145,7 +145,7 @@ def cmd_analyze(args: argparse.Namespace) -> int:
             bundle_path = pathlib.Path(args.output_bundle)
             bundle_path.write_text(bundle.to_canonical_json(), encoding="utf-8")
             if not args.quiet:
-                print(f"[DCAVP] Replay bundle → {bundle_path}", file=sys.stderr)
+                print(f"[DCAP] Replay bundle → {bundle_path}", file=sys.stderr)
 
         return 1 if result.pipeline_blocked else 0
 
@@ -158,7 +158,7 @@ def _print_human(output: dict, result) -> None:
     """Human-readable analysis output."""
     status_sym = "OK" if output["status"] == "PASS" else "X"
     print(f"\n{'='*60}")
-    print(f"  DCAVP Analysis Report")
+    print(f"  DCAP Analysis Report")
     print(f"{'='*60}")
     print(f"  Status         : {status_sym} {output['status']}")
     print(f"  Tier           : {output['tier']}")
@@ -223,7 +223,7 @@ def _print_html(output: dict, result, filepath: str) -> None:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DCAVP Security Report — {output['source_root']}</title>
+    <title>DCAP Security Report — {output['source_root']}</title>
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{ font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #e2e8f0; padding: 2rem; }}
@@ -248,7 +248,7 @@ def _print_html(output: dict, result, filepath: str) -> None:
 </head>
 <body>
     <div class="container">
-        <h1>DCAVP Security Analysis Report</h1>
+        <h1>DCAP Security Analysis Report</h1>
         <p class="subtitle">Deterministic security analysis for AI-generated Python code</p>
         <div class="status-badge">{status_text}</div>
         
@@ -279,14 +279,14 @@ def _print_html(output: dict, result, filepath: str) -> None:
         </div>
         
         <div class="footer">
-            DCAVP v0.1.0 | Confidence: {output['trust_level']} | {'Pipeline BLOCKED' if output['pipeline_blocked'] else 'Pipeline CLEAR'}
+            DCAP v0.1.0 | Confidence: {output['trust_level']} | {'Pipeline BLOCKED' if output['pipeline_blocked'] else 'Pipeline CLEAR'}
         </div>
     </div>
 </body>
 </html>"""
     
     pathlib.Path(filepath).write_text(html, encoding='utf-8')
-    print(f"\n[DCAVP] HTML report written to: {filepath}", file=sys.stderr)
+    print(f"\n[DCAP] HTML report written to: {filepath}", file=sys.stderr)
 
 
 def _print_html(output: dict, result, filepath: str) -> None:
@@ -314,7 +314,7 @@ def _print_html(output: dict, result, filepath: str) -> None:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DCAVP Security Report — {output['source_root']}</title>
+    <title>DCAP Security Report — {output['source_root']}</title>
     <style>
         * {{ margin: 0; padding: 0; box-sizing: border-box; }}
         body {{ font-family: 'Segoe UI', system-ui, sans-serif; background: #0f172a; color: #e2e8f0; padding: 2rem; }}
@@ -339,7 +339,7 @@ def _print_html(output: dict, result, filepath: str) -> None:
 </head>
 <body>
     <div class="container">
-        <h1>DCAVP Security Analysis Report</h1>
+        <h1>DCAP Security Analysis Report</h1>
         <p class="subtitle">Deterministic security analysis for AI-generated Python code</p>
         <div class="status-badge">{status_text}</div>
         
@@ -370,14 +370,14 @@ def _print_html(output: dict, result, filepath: str) -> None:
         </div>
         
         <div class="footer">
-            DCAVP v0.1.0 | Confidence: {output['trust_level']} | {'Pipeline BLOCKED' if output['pipeline_blocked'] else 'Pipeline CLEAR'}
+            DCAP v0.1.0 | Confidence: {output['trust_level']} | {'Pipeline BLOCKED' if output['pipeline_blocked'] else 'Pipeline CLEAR'}
         </div>
     </div>
 </body>
 </html>"""
     
     pathlib.Path(filepath).write_text(html, encoding='utf-8')
-    print(f"\n[DCAVP] HTML report written to: {filepath}", file=sys.stderr)
+    print(f"\n[DCAP] HTML report written to: {filepath}", file=sys.stderr)
     print(f"{'='*60}\n")
 
 
@@ -389,13 +389,13 @@ def cmd_verify(args: argparse.Namespace) -> int:
 
         source_root = args.source_root or str(pathlib.Path(__file__).parent.parent.parent.parent)
         if not args.quiet:
-            print(f"[DCAVP] Running self-verification on: {source_root}", file=sys.stderr)
+            print(f"[DCAP] Running self-verification on: {source_root}", file=sys.stderr)
 
         gateway = SelfVerificationGateway(source_root)
         report  = gateway.verify()
 
         print(f"\n{'='*60}")
-        print(f"  DCAVP Self-Verification Report")
+        print(f"  DCAP Self-Verification Report")
         print(f"{'='*60}")
         print(f"  Timestamp  : {report.timestamp_utc}")
         print(f"  Kernel     : {report.kernel_version}")
@@ -431,7 +431,7 @@ def cmd_catalog(args: argparse.Namespace) -> int:
         is_valid, diag = catalog.verify_integrity()
 
         print(f"\n{'='*60}")
-        print(f"  DCAVP Knowledge Catalog")
+        print(f"  DCAP Knowledge Catalog")
         print(f"{'='*60}")
         print(f"  Version    : {summary['catalog_version']}")
         print(f"  Constructs : {summary['construct_count']}")
@@ -456,12 +456,12 @@ def cmd_catalog(args: argparse.Namespace) -> int:
 
 
 def main() -> int:
-    """DCAVP CLI entry point."""
+    """DCAP CLI entry point."""
     parser = argparse.ArgumentParser(
-        prog="dcavp",
-        description="DCAVP — Deterministic Context-Aware Verification Platform",
+        prog="dcap",
+        description="DCAP — Deterministic Context-Aware Verification Platform",
     )
-    parser.add_argument("--version", action="version", version="dcavp-kernel/0.1.0")
+    parser.add_argument("--version", action="version", version="dcap-kernel/0.1.0")
 
     sub = parser.add_subparsers(dest="command", required=True)
 
@@ -484,7 +484,7 @@ def main() -> int:
     # verify (self-verification)
     p_verify = sub.add_parser("verify", help="Run self-verification gateway")
     p_verify.add_argument("--source-root", default=None,
-                           help="Path to DCAVP source (default: auto-detect)")
+                           help="Path to DCAP source (default: auto-detect)")
     p_verify.add_argument("--quiet", action="store_true")
 
     # catalog

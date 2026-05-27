@@ -1,0 +1,2 @@
+[console_scripts]
+dcavp = interfaces.cli.dcavp_cli:main
