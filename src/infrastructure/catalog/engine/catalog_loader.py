@@ -69,17 +69,13 @@ from src.infrastructure.catalog.entries.python.eval_construct import (
 from src.infrastructure.catalog.entries.python.python_constructs import (
     ALL_PYTHON_CONSTRUCTS,
 )
-# Dynamic catalog loading
-import importlib.util
-EXTENDED_CONSTRUCTS = ()
-try:
-    spec = importlib.util.spec_from_file_location("extended", "compiled_extended.pyd")
-    if spec:
-        mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(mod)
-        EXTENDED_CONSTRUCTS = mod.EXTENDED_CONSTRUCTS
-except Exception:
-    pass  # Community Edition
+import sys
+from src.infrastructure.catalog.engine.plugin_loader import load_pro_plugin
+EXTENDED_CONSTRUCTS = load_pro_plugin()
+if EXTENDED_CONSTRUCTS:
+    print("[DCAP] Advanced Threat Intelligence: ACTIVE", file=sys.stderr)
+else:
+    print("[DCAP] Community Intelligence: ACTIVE (Upgrade for Pro)", file=sys.stderr)
 
 
 # ─── Error Types ──────────────────────────────────────────────────────────────

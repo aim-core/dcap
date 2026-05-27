@@ -29,3 +29,8 @@ private/
 # OS
 Thumbs.db
 .DS_Store
+private_core/ 
+dcap_pro.pyd 
+dcap_pro*.pyd 
+*.egg-info 
+__pycache__/ 
