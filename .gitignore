@@ -3,3 +3,4 @@ __pycache__/
 _*.py 
 dcavp-report.html 
 interfaces/auth/github_auth.py 
+compiled_extended.pyd 
