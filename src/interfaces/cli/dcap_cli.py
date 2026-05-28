@@ -46,6 +46,24 @@ from datetime import datetime, timezone
 def _utc_now() -> str:
     return datetime.now(tz=timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
 
+def cmd_upgrade(args: argparse.Namespace) -> int:
+    """CLI command: dcap upgrade"""
+    print("[DCAP] Upgrade your plan at: https://dcap.dev/pro")
+    print("[DCAP] Current tier: COMMUNITY")
+    print("[DCAP] To activate a license: dcap activate --key <license_key>")
+    return 0
+
+
+def cmd_activate(args: argparse.Namespace) -> int:
+    """CLI command: dcap activate"""
+    import sys, pathlib
+    sys.path.insert(0, str(pathlib.Path(__file__).parent.parent.parent.parent))
+    from src.application.gateway.license_manager import activate_license
+    if activate_license(args.key):
+        print("[DCAP] License activated! Restart DCAP to apply.")
+        return 0
+    print("[DCAP] Invalid license key.")
+    return 1
 
 def cmd_analyze(args: argparse.Namespace) -> int:
     """
@@ -131,6 +149,10 @@ def cmd_analyze(args: argparse.Namespace) -> int:
             "warnings": list(result.analysis_warnings[:10]),
         }
 
+        tier = args.tier.upper() if hasattr(args, "tier") else "BLUE"
+        if args.format == "json" and tier in ("GREEN",):
+            print("[DCAP] JSON export requires BLUE tier or higher. Upgrade at https://dcap.dev/pro", file=sys.stderr)
+            return 1
         if args.format == "json":
             print(json.dumps(output, indent=2))
         elif args.format == "html":
@@ -486,12 +508,17 @@ def main() -> int:
     p_verify.add_argument("--source-root", default=None,
                            help="Path to DCAP source (default: auto-detect)")
     p_verify.add_argument("--quiet", action="store_true")
-
+    p_upgrade = sub.add_parser("upgrade", help="Upgrade to DCAP Pro")
+    p_activate = sub.add_parser("activate", help="Activate a DCAP Pro license")
+    p_activate.add_argument("--key", required=True, help="License key")
     # catalog
     p_catalog = sub.add_parser("catalog", help="Show catalog information")
 
     args = parser.parse_args()
-
+    if args.command == "upgrade":
+        return cmd_upgrade(args)
+    if args.command == "activate":
+        return cmd_activate(args)
     if args.command == "analyze":
         return cmd_analyze(args)
     elif args.command == "verify":
