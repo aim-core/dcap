@@ -153,6 +153,11 @@ def cmd_analyze(args: argparse.Namespace) -> int:
         if args.format == "json" and tier in ("GREEN",):
             print("[DCAP] JSON export requires BLUE tier or higher. Upgrade at https://dcap.dev/pro", file=sys.stderr)
             return 1
+        if args.format == "html" and tier in ("GREEN", "BLUE"):
+            print("[DCAP] HTML reports require YELLOW tier or higher. Upgrade at https://dcap.dev/pro", file=sys.stderr)
+            return 1
+            print("[DCAP] JSON export requires BLUE tier or higher. Upgrade at https://dcap.dev/pro", file=sys.stderr)
+            return 1
         if args.format == "json":
             print(json.dumps(output, indent=2))
         elif args.format == "html":
