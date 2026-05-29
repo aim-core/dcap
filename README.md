@@ -21,7 +21,32 @@ DCAP is not a scanner. It is a **deterministic audit platform** for AI-generated
 - **Cryptographically verifiable** — every report has a Proof Signature
 
 ---
+## Usage
 
+```bash
+# Basic analysis (Community Edition)
+dcap analyze ./my_project --tier GREEN
+
+# Professional analysis
+dcap analyze ./my_project --tier BLUE
+
+# Enterprise governance
+dcap analyze ./my_project --tier YELLOW --format html
+
+# Forensic audit (RED tier)
+dcap analyze ./my_project --tier RED --format json
+
+# Self-verification
+dcap verify
+
+# Show catalog information
+dcap catalog
+
+# Activate Pro license
+dcap activate --key <license_key>
+
+# Upgrade to Pro
+dcap upgrade
 ## Quick Start
 
 ```bash
