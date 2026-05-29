@@ -1,7 +1,8 @@
 # 🏛️ DCAP
 
-**Deterministic Code Analysis Platform**
+## Deterministic Code Analysis Platform
 
+<<<<<<< HEAD
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
@@ -53,6 +54,47 @@ The platform is intentionally:
 
 # Why DCAP Exists
 
+=======
+Deterministic security analysis for AI-generated software systems.
+
+![Python](https://img.shields.io/badge/python-3.12%2B-blue)
+![License](https://img.shields.io/badge/license-Apache%202.0-green)
+![Deterministic](https://img.shields.io/badge/analysis-deterministic-critical)
+![Local First](https://img.shields.io/badge/runtime-local--first-orange)
+
+---
+
+# What is DCAP?
+
+DCAP is a deterministic audit platform designed to analyze
+AI-generated software using evidence-driven mathematical analysis.
+
+DCAP does not rely on:
+
+* probabilistic AI guesses
+* hidden heuristics
+* opaque scoring
+* remote cloud inference
+
+Instead, it relies on:
+
+* deterministic AST analysis
+* replay-safe evaluation
+* rule-governed scoring
+* mathematically reproducible execution paths
+
+The platform is intentionally:
+
+* local-first
+* deterministic
+* governance-oriented
+* operationally explainable
+
+---
+
+# Why DCAP Exists
+
+>>>>>>> f55e715ee28b53078f3a6763471424671596c521
 AI-generated software introduced a new category of problems:
 
 * hallucinated logic
