@@ -2,7 +2,6 @@
 
 **Deterministic Code Analysis Platform**
 
-*The only security tool that admits when it fails.*
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)
 [![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
@@ -11,221 +10,443 @@
 
 ---
 
-## What is DCAP?
+# 🏛️ DCAP
 
-DCAP is a **deterministic forensic audit platform** for AI-generated Python code.
+## Deterministic Code Analysis Platform
 
-It does not guess. It does not use AI to analyze AI. It uses **deterministic AST pattern matching** with cryptographic proof that every result is reproducible.
+Deterministic security analysis for AI-generated software systems.
 
-- **Zero false positives** — exact pattern matching only
-- **Self-verifying** — 6/6 governance gates before analyzing your code
-- **Honest** — admits when analysis is incomplete (Pattern Vacuum)
-- **Local-first** — your code never leaves your machine
-- **Cryptographically verifiable** — every report has a Proof Signature and Replay Fingerprint
+![Python](https://img.shields.io/badge/python-3.12%2B-blue)
+![License](https://img.shields.io/badge/license-Apache%202.0-green)
+![Deterministic](https://img.shields.io/badge/analysis-deterministic-critical)
+![Local First](https://img.shields.io/badge/runtime-local--first-orange)
 
 ---
 
-## Quick Start
+# What is DCAP?
 
-```bash
+DCAP is a deterministic audit platform designed to analyze
+AI-generated software using evidence-driven mathematical analysis.
+
+DCAP does not rely on:
+
+* probabilistic AI guesses
+* hidden heuristics
+* opaque scoring
+* remote cloud inference
+
+Instead, it relies on:
+
+* deterministic AST analysis
+* replay-safe evaluation
+* rule-governed scoring
+* mathematically reproducible execution paths
+
+The platform is intentionally:
+
+* local-first
+* deterministic
+* governance-oriented
+* operationally explainable
+
+---
+
+# Why DCAP Exists
+
+AI-generated software introduced a new category of problems:
+
+* hallucinated logic
+* fake fixes
+* hidden execution paths
+* insecure dependency chains
+* deterministic violations
+* silent recovery corruption
+* inconsistent security behavior
+
+Traditional scanners detect syntax-level issues.
+
+DCAP attempts to evaluate:
+
+* execution risk
+* deterministic integrity
+* operational trust boundaries
+* governance posture
+* correlation between dangerous constructs
+
+---
+
+# Core Principles
+
+## Determinism
+
+Same input.
+Same catalog.
+Same execution path.
+Same result.
+
+Always.
+
+---
+
+## Honest Analysis
+
+DCAP explicitly reports:
+
+* unsupported constructs
+* degraded rule execution
+* partial visibility
+* incomplete deterministic guarantees
+
+The platform never fabricates certainty.
+
+---
+
+## Self-Governance
+
+DCAP verifies itself before analyzing target code.
+
+Every release must pass deterministic governance checks.
+
+---
+
+# Supported Platforms
+
+## Windows
+
+```bash id="2yxv8r"
 pip install dcap
 
-# Basic analysis (Community Edition)
-dcap analyze ./my_project --tier GREEN
+dcap analyze . --tier GREEN
+```
 
-# Self-verification — does the platform trust itself?
-dcap verify
-Output:
+PowerShell:
 
-text
+```powershell id="h2m7x1"
+dcap analyze "C:\project" --tier BLUE
+```
+
+---
+
+## Linux
+
+```bash id="f9e3zq"
+pip install dcap
+
+dcap analyze /opt/project --tier YELLOW
+```
+
+---
+
+## macOS
+
+```bash id="o6k8cn"
+pip3 install dcap
+
+dcap analyze ~/project --tier GREEN
+```
+
+---
+
+# Analysis Modes
+
+| Mode                    | Purpose                           |
+| ----------------------- | --------------------------------- |
+| Deterministic Scan      | Mathematical rule evaluation      |
+| Correlation Analysis    | Dangerous construct relationships |
+| Governance Verification | Self-integrity validation         |
+| Replay Validation       | Deterministic replay proof        |
+| Tier Enforcement        | Operational deployment policy     |
+| Forensic Audit          | Zero-trust security posture       |
+
+---
+
+# The Four Tiers
+
+## 🟢 GREEN — Community
+
+Designed for:
+
+* students
+* local developers
+* educational usage
+
+Characteristics:
+
+* CLI-only reporting
+* lightweight deterministic scanning
+* operational warnings
+* limited governance depth
+
+Deployment policy:
+
+* permissive
+
+---
+
+## 🔵 BLUE — Professional
+
+Designed for:
+
+* professional developers
+* CI/CD environments
+* production engineering teams
+
+Characteristics:
+
+* enhanced reporting
+* correlation analysis
+* deterministic score model
+* replay verification
+* exportable reports
+
+Deployment policy:
+
+* operational governance
+
+---
+
+## 🟡 YELLOW — Enterprise
+
+Designed for:
+
+* enterprises
+* fintech
+* regulated environments
+* security teams
+
+Characteristics:
+
+* advanced governance enforcement
+* forensic reporting
+* deeper policy controls
+* operational restrictions
+* structured export formats
+
+Deployment policy:
+
+* enterprise-grade review enforcement
+
+---
+
+## 🔴 RED — Forensic
+
+Designed for:
+
+* defense
+* aerospace
+* critical infrastructure
+* medical systems
+* zero-trust environments
+
+Characteristics:
+
+* forensic enforcement
+* catastrophic risk escalation
+* replay integrity enforcement
+* aggressive deployment blocking
+* maximum deterministic scrutiny
+
+Deployment policy:
+
+* zero-trust forensic posture
+
+---
+
+# Example Analysis
+
+```bash id="k4zq1m"
+dcap analyze ./project --tier RED
+```
+
+Example output:
+
+```text id="v1x2nb"
 ============================================================
-  DCAP RED TIER - FORENSIC AUDIT REPORT
+DCAP Analysis Report
 ============================================================
-  Report ID      : DCAP-RED-20260529-77C967
-  Detection      : COMPLETE - 8 findings in 92 files
-  Tier Policy    : BLOCKED - Zero-trust forensic policy.
-  Security Score  : 20/100 - F
 
-  EXECUTIVE VERDICT
-  CRITICAL: Multiple attack chains detected.
-  Deployment prohibited without full remediation.
+Status          : BLOCKED
+Tier            : RED
+Files           : 91
+Findings        : 4
+Security Score  : 55/100
+Grade           : D — High Operational Risk
 
-  F-00008 CRITICAL eval [TAINTED]
-     Root Cause: User-controlled input reaches this execution sink
+Replay Proof    : VERIFIED
+Catalog Version : 2026.05.12
+Engine Trust    : VERIFIED
 
-  CORRELATION ALERT: Execution Chain Detected
-     5 constructs form an attack chain: os.system -> subprocess -> eval -> exec -> eval
+Findings:
+- eval() detected
+- exec() detected
+- subprocess(shell=True)
+- pickle.loads()
 
-  DETERMINISTIC EVIDENCE
-  Proof Sig      : 0eedf0fa64baa5d5
-  Replay FP      : b21ff115e828
-  This analysis is cryptographically verifiable.
-  Same code + Same catalog + Same seed = Same result.
+Deployment:
+RESTRICTED under RED tier policy
+```
 
-  FINAL DECISION: RESTRICTED under RED tier policy
-Commands
-bash
-# Basic analysis
-dcap analyze ./my_project --tier GREEN
+---
 
-# Professional analysis with JSON export
-dcap analyze ./my_project --tier BLUE --format json
+# Analysis Performance
 
-# Enterprise governance with HTML report
-dcap analyze ./my_project --tier YELLOW --format html
+DCAP is designed for deterministic local execution.
 
-# Forensic audit
-dcap analyze ./my_project --tier RED
+Typical scan time:
 
-# Self-verification
+| Project Size       | Approximate Time |
+| ------------------ | ---------------- |
+| Small scripts      | 20–80ms          |
+| Medium projects    | 80–300ms         |
+| Large repositories | 300–1500ms       |
+
+Performance depends on:
+
+* file count
+* AST complexity
+* enabled governance layers
+* replay verification depth
+
+No cloud processing is required.
+
+Your code never leaves your machine.
+
+---
+
+# Deterministic Scoring Model
+
+DCAP uses weighted mathematical evaluation.
+
+The scoring engine evaluates:
+
+```text id="i31m7g"
+Severity × Confidence × Reachability × Exposure
+```
+
+Additional adjustments:
+
+* correlation penalties
+* deterministic degradation
+* runtime execution surfaces
+* catastrophic escalation
+
+The engine intentionally avoids:
+
+* AI-generated scores
+* random weighting
+* probabilistic guessing
+
+---
+
+# Self Verification
+
+```bash id="vf91ap"
 dcap verify
+```
 
-# Show catalog information
-dcap catalog
+Example:
 
-# Activate Pro license
-dcap activate --key <license_key>
+```text id="q8z4ca"
+6/6 governance checks passed.
+RELEASE ELIGIBLE.
+```
 
-# Upgrade information
-dcap upgrade
-Command	Description
-dcap analyze <path>	Analyze a project
-dcap verify	Self-verification (6/6 governance gates)
-dcap catalog	Show detection catalog
-dcap upgrade	Upgrade to Pro information
-dcap activate --key <key>	Activate Pro license
-Flag	Values	Description
---tier	GREEN, BLUE, YELLOW, RED	Analysis depth (default: BLUE)
---format	human, json, html	Output format (default: human)
---output	PATH	Save replay bundle
---quiet	—	Suppress progress output
-Analysis Tiers
-Tier	Audience	Policy	Score	Reports
-🟢 GREEN	Students, beginners	PERMITTED — Educational only. NOT a safety rating.	—	Terminal
-🔵 BLUE	Professional developers	PERMITTED — Standard CI/CD	—	Terminal + JSON
-🟡 YELLOW	Enterprises, DevSecOps	RESTRICTED — Enterprise governance	✅	Terminal + JSON + HTML
-🔴 RED	Defense, aerospace, medical	BLOCKED — Zero-trust forensic	✅	Terminal + JSON + HTML + Signed
-Community vs Pro
-Feature	Community	Pro
-Patterns	6 basic	17 advanced
-AI Hallucination Detection	❌	✅
-Security Theater Detection	❌	✅
-JWT Algorithm None	❌	✅
-Crypto ECB Mode	❌	✅
-Template Injection (SSTI)	❌	✅
-TAINTED Input Detection	❌	✅
-Correlation Intelligence	❌	✅
-Root Cause Analysis	❌	✅
-Proof Signature	✅	✅
-Replay Fingerprint	✅	✅
-Tiers	GREEN only	All 4 tiers
-License	Apache 2.0	Commercial
-Upgrade to Pro →
+Verification includes:
 
-What DCAP Detects
-Pattern	Severity	CWE	Community	Pro
-eval()	CRITICAL	CWE-94	✅	✅
-exec()	CRITICAL	CWE-94	✅	✅
-subprocess with shell=True	CRITICAL	CWE-78	✅	✅
-pickle.loads()	CRITICAL	CWE-502	✅	✅
-os.system()	CRITICAL	CWE-78	❌	✅
-SQL injection	CRITICAL	CWE-89	❌	✅
-open() with user path	CRITICAL	CWE-22	✅	✅
-yaml.load()	ERROR	CWE-502	❌	✅
-requests.get() SSRF	ERROR	CWE-918	❌	✅
-os.remove()	ERROR	CWE-22	❌	✅
-random for security tokens	WARNING	CWE-338	✅	✅
-debug=True in Flask	WARNING	CWE-489	❌	✅
-AI Hallucinated Package	CRITICAL	CWE-1104	❌	✅
-Security Theater	ERROR	CWE-916	❌	✅
-JWT Algorithm None	ERROR	CWE-347	❌	✅
-Crypto ECB Mode	ERROR	CWE-327	❌	✅
-Template Injection	CRITICAL	CWE-94	❌	✅
-Why DCAP?
-Capability	DCAP	Bandit	Snyk	SonarQube
-Deterministic results	✅ Always	✅ Yes	❌ No	❌ No
-Self-verification (6/6)	✅	❌	❌	❌
-Admits analysis failure	✅ Pattern Vacuum	❌	❌	❌
-Proof Certificate	✅ SHA-256	❌	❌	❌
-Replay Fingerprint	✅	❌	❌	❌
-Root Cause Intelligence	✅	❌	❌	❌
-Correlation Analysis	✅	❌	❌	❌
-TAINTED Input Detection	✅	❌	❌	❌
-Zero external dependencies	✅	✅	❌	❌
-Local-first (no cloud)	✅	✅	❌	❌
-AI-specific patterns	✅	❌	❌	❌
-Self-Verification
-DCAP verifies itself before it verifies you. Every commit must pass 6 governance checks under RED tier.
+* replay consistency
+* rule integrity
+* catalog integrity
+* deterministic constraints
+* governance validation
+* execution trust verification
 
-bash
-$ dcap verify
+---
 
-6/6 checks passed. RELEASE ELIGIBLE.
-Check	Purpose
-CHECK-SV-001	Catalog Merkle Integrity
-CHECK-SV-002	Policy Source References
-CHECK-SV-003	Dependency Whitelist
-CHECK-SV-004	RED Tier Self-Analysis
-CHECK-SV-005	Triple Replay Validation
-CHECK-SV-006	Governance Gates
-A platform that cannot verify itself cannot verify other software.
+# Current Detection Coverage
 
-Deterministic Evidence
-Every report includes cryptographic proof:
+| Pattern                | Severity | CWE     |
+| ---------------------- | -------- | ------- |
+| eval()                 | CRITICAL | CWE-94  |
+| exec()                 | CRITICAL | CWE-94  |
+| subprocess(shell=True) | CRITICAL | CWE-78  |
+| pickle.loads()         | CRITICAL | CWE-502 |
+| os.system()            | CRITICAL | CWE-78  |
+| SQL injection patterns | CRITICAL | CWE-89  |
+| yaml.load()            | ERROR    | CWE-502 |
+| SSRF patterns          | ERROR    | CWE-918 |
+| insecure randomness    | WARNING  | CWE-338 |
 
-text
-Proof Sig      : 0eedf0fa64baa5d5    (SHA-256 of all findings)
-Replay FP      : b21ff115e828        (Replay fingerprint)
-Catalog Ver    : 2026.05.12
-Engine Ver     : dcavp-kernel/0.1.0
-Same code + Same catalog + Same seed = Same result. Always.
+---
 
-Current Scope
-Implemented:
+# Pro Edition
 
-Deterministic AST pattern matching
+Professional tiers add:
 
-Correlation-aware scoring
+* AI hallucinated logic detection
+* security theater detection
+* deterministic integrity analysis
+* governance policy enforcement
+* architectural contradiction analysis
+* replay-aware forensic reporting
+* enhanced export systems
 
-Governance policy enforcement (4 tiers)
+---
 
-Replay-safe evaluation
+# Current Scope and Limitations
 
-Cryptographic proof signatures
+DCAP currently focuses on:
 
-TAINTED input detection
-
-Root cause intelligence
-
-AI-specific pattern detection (Pro)
+* deterministic static analysis
+* AST evidence correlation
+* governance-oriented enforcement
 
 Not yet implemented:
 
-Taint propagation engine
+* taint propagation graphs
+* symbolic execution
+* runtime flow reconstruction
+* interprocedural reasoning
+* probabilistic exploit simulation
+* memory corruption propagation analysis
 
-Symbolic execution
+The platform intentionally reports these boundaries openly.
 
-Interprocedural reasoning
+---
 
-Exploit path simulation
+# Philosophy
 
-Philosophy
-DCAP does not attempt to simulate human intuition.
-It provides reproducible evidence, deterministic reasoning,
-and operationally explainable security analysis
-for the AI-generated software era.
+DCAP does not attempt to imitate intuition.
 
-Determinism — Same input = Same output. Always.
+It attempts to provide:
 
-Honesty — We admit what we cannot see.
+* deterministic reasoning
+* mathematically reproducible analysis
+* explainable operational evidence
+* governance-aware security decisions
 
-Self-Governance — We verify ourselves before we verify you.
+for the era of AI-generated software.
 
-License
-Community Edition: Apache 2.0
+---
 
-Pro Edition: Commercial license — https://dcap.dev/pro
+# License
 
-Enterprise: Custom licensing for on-prem, air-gapped, and government deployments.
+Apache 2.0
 
-<div align="center"> Built for the AI-generated code era. </div> ```
+Community edition:
+
+* local-first
+* deterministic
+* transparent
+
+Professional and enterprise modules:
+https://dcap.dev/pro
+
+---
+
+<div align="center">
+
+Built for the AI-generated software era.
+
+Deterministic by design.
+
+</div>
