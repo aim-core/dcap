@@ -40,6 +40,9 @@ import argparse
 import json
 import sys
 import pathlib
+import sys, pathlib
+sys.path.insert(0, str(pathlib.Path(__file__).parent.parent.parent.parent))
+from src.interfaces.report.human_readable import print_human_report
 from datetime import datetime, timezone
 
 
@@ -165,7 +168,7 @@ def cmd_analyze(args: argparse.Namespace) -> int:
             from src.interfaces.report.html_report import generate_html_report
             generate_html_report(output, result, html_path)
         else:
-            _print_human(output, result)
+            print_human_report(output, result)
 
         # Write replay bundle if requested
         if args.output_bundle:

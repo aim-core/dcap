@@ -5,7 +5,7 @@
  * MODULE:      HTML Report Generator
  * PURPOSE:     Generate enterprise-grade HTML security reports
  * DOMAIN:      Interfaces
- * AUTHOR:      DCAVP Engineering System
+ * AUTHOR:      DCAP Engineering System
  * CREATED:     2026-05-22
  * UPDATED:     2026-05-22
  * VERSION:     v0.1.0
@@ -36,7 +36,7 @@ def generate_html_report(output: dict, result: Any, filepath: str) -> None:
     status_desc = "Safe to deploy" if is_clean else "Do not deploy — critical issues found"
     
     tier_colors = {"GREEN": "#22c55e", "BLUE": "#3b82f6", "YELLOW": "#eab308", "RED": "#ef4444"}
-    tier_names = {"GREEN": "Basic", "BLUE": "Standard", "YELLOW": "Industrial", "RED": "Military-Grade"}
+    tier_names = {"GREEN": "Basic", "BLUE": "Standard", "YELLOW": "Industrial", "RED": "Safety-Critical"}
     tier_color = tier_colors.get(tier, "#6b7280")
     tier_name = tier_names.get(tier, tier)
     
@@ -94,11 +94,11 @@ def generate_html_report(output: dict, result: Any, filepath: str) -> None:
 <div style="display:flex;justify-content:space-between;align-items:center">
 <div><div style="font-weight:bold;color:#f1f5f9">{name}</div>
 <div style="color:#94a3b8;font-size:0.85rem">{desc} — Requires {req_tier} tier</div></div>
-<a href="https://dcavp.io/upgrade" style="background:{color};color:white;padding:0.5rem 1rem;border-radius:0.5rem;text-decoration:none;font-weight:bold;font-size:0.85rem">UPGRADE</a></div></div>"""
+<a href="https://dcap.io/upgrade" style="background:{color};color:white;padding:0.5rem 1rem;border-radius:0.5rem;text-decoration:none;font-weight:bold;font-size:0.85rem">UPGRADE</a></div></div>"""
 
     html = f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>DCAVP Security Report — {output['source_root']}</title>
+<title>DCAP Security Report — {output['source_root']}</title>
 <style>
 *{{margin:0;padding:0;box-sizing:border-box}}
 body{{font-family:'Segoe UI',system-ui,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.6}}
@@ -130,7 +130,7 @@ body{{font-family:'Segoe UI',system-ui,sans-serif;background:#0f172a;color:#e2e8
 @media(max-width:768px){{.tiers{{grid-template-columns:repeat(2,1fr)}}.hero h1{{font-size:1.8rem}}}}
 </style></head><body>
 <div class="container">
-<div class="hero"><h1>DCAVP Security Analysis</h1><p class="subtitle">Deterministic Code Analysis & Verification Platform</p>
+<div class="hero"><h1>DCAP Security Analysis</h1><p class="subtitle">Deterministic Code Analysis & Verification Platform</p>
 <div class="status-pill">{status_emoji} — {status_text}</div><p class="status-desc">{status_desc}</p>
 <p style="color:#64748b;font-size:0.85rem;margin-top:0.5rem">Analysis: {datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}</p></div>
 
@@ -157,30 +157,30 @@ body{{font-family:'Segoe UI',system-ui,sans-serif;background:#0f172a;color:#e2e8
 <div class="card"><h2>Findings ({len(findings)})</h2>
 {findings_html if findings_html else '<p style="color:#22c55e;text-align:center;padding:2rem">No findings — your code passed all security checks.</p>'}</div>
 
-<div class="card"><h2>Analysis Depth</h2><p style="color:#94a3b8;margin-bottom:1rem;font-size:0.9rem">DCAVP offers four tiers. Your current tier is highlighted.</p>
+<div class="card"><h2>Analysis Depth</h2><p style="color:#94a3b8;margin-bottom:1rem;font-size:0.9rem">DCAP offers four tiers. Your current tier is highlighted.</p>
 <div class="tiers">
 <div class="tier-card {'active' if tier=='GREEN' else ''}"><div class="name" style="color:#22c55e">GREEN</div><div class="level">Basic</div><div style="font-size:0.75rem;color:#94a3b8;margin-top:0.5rem">Warnings only</div></div>
 <div class="tier-card {'active' if tier=='BLUE' else ''}"><div class="name" style="color:#3b82f6">BLUE</div><div class="level">Standard</div><div style="font-size:0.75rem;color:#94a3b8;margin-top:0.5rem">CI/CD default</div></div>
 <div class="tier-card {'active' if tier=='YELLOW' else ''}"><div class="name" style="color:#eab308">YELLOW</div><div class="level">Industrial</div><div style="font-size:0.75rem;color:#94a3b8;margin-top:0.5rem">Supply chain</div></div>
-<div class="tier-card {'active' if tier=='RED' else ''}"><div class="name" style="color:#ef4444">RED</div><div class="level">Military-Grade</div><div style="font-size:0.75rem;color:#94a3b8;margin-top:0.5rem">Aerospace</div></div></div></div>
+<div class="tier-card {'active' if tier=='RED' else ''}"><div class="name" style="color:#ef4444">RED</div><div class="level">Safety-Critical</div><div style="font-size:0.75rem;color:#94a3b8;margin-top:0.5rem">Aerospace</div></div></div></div>
 
-<div class="card"><h2>Enterprise Features</h2><p style="color:#94a3b8;margin-bottom:1rem;font-size:0.9rem">Unlock the full power of DCAVP.</p>
+<div class="card"><h2>DCAP Enterprise - Available on Request</h2><p style="color:#94a3b8;margin-bottom:1rem;font-size:0.9rem">Unlock the full power of DCAP.</p>
 <div style="display:flex;flex-direction:column;gap:0.75rem">{locked_rows}</div></div>
 
 <div style="text-align:center;padding:2rem 0">
 <h2 style="color:#f8fafc;margin-bottom:0.5rem">Ready to secure your codebase?</h2>
 <p style="color:#94a3b8;margin-bottom:1.5rem">Upgrade to unlock enterprise features and advanced analysis.</p>
-<a href="https://dcavp.io/upgrade" class="btn btn-primary" style="font-size:1.1rem;padding:1rem 2rem">Upgrade Now</a>
-<a href="https://dcavp.io/docs" class="btn" style="background:#334155;color:#e2e8f0;margin-left:0.75rem">Documentation</a></div>
+<a href="https://dcap.io/upgrade" class="btn btn-primary" style="font-size:1.1rem;padding:1rem 2rem">Upgrade Now</a>
+<a href="https://dcap.io/docs" class="btn" style="background:#334155;color:#e2e8f0;margin-left:0.75rem">Documentation</a></div>
 
 <div class="footer">
-<p><strong>Verification Certificate</strong><br>This certifies that <code>{output['source_root']}</code><br>was analyzed by DCAVP v0.1.0 under {tier} tier rules.<br>Artifact Hash: <code>{output['artifact_hash']}</code></p>
-<p style="margin-top:0.75rem">This hash is cryptographically unique and cannot be forged.</p>
-<p style="margin-top:1.5rem"><strong>DCAVP</strong> — Deterministic Code Analysis & Verification Platform<br>
-<a href="https://dcavp.io">https://dcavp.io</a> | <a href="mailto:security@dcavp.io">security@dcavp.io</a></p>
-<p style="margin-top:1rem;color:#475569">2026 DCAVP. Apache 2.0 License. All analysis results are deterministically reproducible.</p></div>
+<p><strong>Verification Certificate</strong><br>This certifies that <code>{output['source_root']}</code><br>was analyzed by DCAP v0.1.0 under {tier} tier rules.<br>Artifact Hash: <code>{output['artifact_hash']}</code></p>
+<p style="margin-top:0.75rem">This hash is cryptographically unique and is tamper-evident.</p>
+<p style="margin-top:1.5rem"><strong>DCAP</strong> — Deterministic Code Analysis & Verification Platform<br>
+<a href="https://dcap.io">https://dcap.io</a> | <a href="mailto:security@dcap.io">security@dcap.io</a></p>
+<p style="margin-top:1rem;color:#475569">2026 DCAP. Apache 2.0 License. All analysis results are deterministically reproducible.</p></div>
 </div></body></html>"""
     
     pathlib.Path(filepath).write_text(html, encoding='utf-8')
     import sys
-    print(f"\n[DCAVP] HTML report written to: {filepath}", file=sys.stderr)
+    print(f"\n[DCAP] HTML report written to: {filepath}", file=sys.stderr)

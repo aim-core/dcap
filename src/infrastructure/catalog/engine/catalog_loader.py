@@ -71,7 +71,8 @@ from src.infrastructure.catalog.entries.python.python_constructs import (
 )
 import sys
 from src.infrastructure.catalog.engine.plugin_loader import load_pro_plugin
-EXTENDED_CONSTRUCTS = load_pro_plugin()
+from src.infrastructure.catalog.engine.plugin_loader import get_extended_constructs as _get_ext
+EXTENDED_CONSTRUCTS = _get_ext()
 if EXTENDED_CONSTRUCTS:
     print("[DCAP] Advanced Threat Intelligence: ACTIVE", file=sys.stderr)
 else:

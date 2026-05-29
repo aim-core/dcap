@@ -15,11 +15,11 @@
 """
 # Fix data 
 FIXES = { 
-    "eval": "Replace with json.loads()", 
-    "exec": "Remove", 
+    "eval": "[ROOT CAUSE] eval() enables arbitrary code execution. Replace with ast.literal_eval() for safe evaluation or json.loads() for data parsing.", 
+    "exec": "[ROOT CAUSE] exec() executes arbitrary Python statements. Use explicit function calls or a safe DSL.", 
     "subprocess": "Pass args as list, shell=False", 
     "pickle.loads": "Use json.loads()", 
-    "os.system": "Use subprocess.run()", 
+    "os.system": "[ROOT CAUSE] os.system() executes shell commands directly. If any part of the command comes from user input, attacker gains shell access. [FIX] Use subprocess.run() with shell=False and validated args.", 
     "yaml.load": "Use yaml.safe_load()", 
     "debug=True": "Remove before production", 
     "requests.get": "Restrict to trusted domains", 

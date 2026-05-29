@@ -34,6 +34,7 @@ def compute_security_score(findings, tier: str) -> int:
         severity = f.get("severity", "warning").lower()
         weight = SEVERITY_WEIGHTS.get(severity, 3)
         total_penalty += weight * multiplier
+        
     return int(max(0, min(100, BASE_SCORE - total_penalty)))
 
 def get_security_grade(score: int) -> str:
