@@ -3,12 +3,12 @@
  * FILE:        /src/interfaces/report/human_readable.py
  * LAYER:       Interface Layer
  * MODULE:      Human-Readable Forensic Report
- * PURPOSE:     Deterministic, honest, tier-aware forensic audit report
+ * PURPOSE:     Deterministic forensic audit report with all intelligence layers
  * DOMAIN:      Report
  * AUTHOR:      DCAP Engineering
  * CREATED:     2026-05-29
  * UPDATED:     2026-05-29
- * VERSION:     v0.5.0
+ * VERSION:     v0.6.0
  *
  * LICENSE: Apache-2.0 / Enterprise Extension
  ******************************************************************************
@@ -17,6 +17,7 @@ import uuid
 import datetime
 import hashlib
 import json
+from pathlib import Path
 
 def print_human_report(output: dict, result) -> None:
     tier = output.get("tier", "BLUE")
@@ -57,21 +58,18 @@ def print_human_report(output: dict, result) -> None:
     constructs = [f.get("construct","") for f in output.get("findings",[])]
     exec_surface = [c for c in constructs if c in ("eval", "exec", "subprocess", "os.system", "pickle.loads")]
     
-    # Executive Verdict
     print(f"\n  {'='*60}")
     print(f"  EXECUTIVE VERDICT")
     print(f"  {'='*60}")
     if output['finding_count'] >= 5 and len(exec_surface) >= 3:
         print(f"  CRITICAL: Multiple attack chains detected.")
-        print(f"  Deployment prohibited without full remediation.")
     elif output['finding_count'] > 0:
-        print(f"  WARNING: Security findings require review before deployment.")
+        print(f"  WARNING: Security findings require review.")
     else:
-        print(f"  CLEAN: No risk patterns detected in analyzed scope.")
+        print(f"  CLEAN: No risk patterns detected.")
     
     if output["findings"]:
         print(f"\n  FORENSIC FINDINGS")
-        print(f"  {'-'*40}")
         for f in output["findings"]:
             sev = f.get("severity", "WARNING").upper()
             state = f.get("state", f.get("detected_state", ""))
@@ -83,13 +81,32 @@ def print_human_report(output: dict, result) -> None:
     
     if len(exec_surface) >= 3:
         print(f"\n  CORRELATION ALERT: Execution Chain Detected")
-        print(f"     {len(exec_surface)} constructs form an attack chain: {' -> '.join(exec_surface)}")
+        print(f"     {len(exec_surface)} constructs form an attack chain.")
+    
+    # Recovery Integrity (YELLOW+)
+    if tier in ("YELLOW", "RED"):
+        try:
+            from src.application.context.recovery_integrity import analyze_recovery_integrity
+            all_issues = []
+            seen = set()
+            for f in output.get("findings", []):
+                loc = f.get("location", "")
+                if loc:
+                    filepath = loc.split(":")[0]
+                    if Path(filepath).exists() and filepath not in seen:
+                        seen.add(filepath)
+                        all_issues.extend(analyze_recovery_integrity(filepath))
+            if all_issues:
+                print(f"\n  RECOVERY INTEGRITY")
+                for i in all_issues[:3]:
+                    print(f"     [{i['type']}] Line {i['line']}: {i['message']}")
+        except Exception as _e:
+            print(f"     [Recovery analysis skipped: {_e}]")
     
     print(f"\n  {'='*60}")
     print(f"  DETERMINISTIC EVIDENCE")
     print(f"  {'='*60}")
     print(f"  This analysis is cryptographically verifiable.")
-    print(f"  Same code + Same catalog + Same seed = Same result.")
     
     if tier == "GREEN":
         print(f"\n  FINAL DECISION: PERMITTED under GREEN tier (Educational)")
