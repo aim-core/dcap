@@ -1,15 +1,3 @@
-# 🏛️ DCAP
-
-## Deterministic Code Analysis Platform
-
-<<<<<<< HEAD
-
-[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)
-[![License: Apache 2.0](https://img.shields.io/badge/license-Apache%202.0-green.svg)](LICENSE)
-[![Self-Verified 6/6](https://img.shields.io/badge/self--verification-6%2F6-brightgreen.svg)](SELF_VERIFICATION.md)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey.svg)]()
-
----
 
 # 🏛️ DCAP
 
