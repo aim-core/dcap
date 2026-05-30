@@ -5,10 +5,10 @@
 
                       Deterministic security analysis for AI-generated software systems.
 
-![Python](https://img.shields.io/badge/python-3.12%2B-blue)
-![License](https://img.shields.io/badge/license-Apache%202.0-green)
-![Deterministic](https://img.shields.io/badge/analysis-deterministic-critical)
-![Local First](https://img.shields.io/badge/runtime-local--first-orange)
+   ![Python](https://img.shields.io/badge/python-3.12%2B-blue)
+                     ![License](https://img.shields.io/badge/license-Apache%202.0-green)
+                     ![Deterministic](https://img.shields.io/badge/analysis-deterministic-critical)
+                     ![Local First](https://img.shields.io/badge/runtime-local--first-orange)
 
 ---
 
