@@ -35,3 +35,5 @@ dcap_pro*.pyd
 *.egg-info 
 __pycache__/ 
 "constructs_extended*.pyd" 
+constructs_extended*.pyd 
+dcap-report.html 
