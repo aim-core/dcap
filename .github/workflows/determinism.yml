@@ -18,13 +18,12 @@ jobs:
         run: pip install -e .
       - name: Self-Verification
         run: dcap verify
-      - name: Analyze Test Project
+      - name: Analyze Test
         run: |
           mkdir -p /tmp/test_project
           echo "eval('test')" > /tmp/test_project/bad.py
           dcap analyze /tmp/test_project --tier RED --format json > linux-result.json
-      - name: Upload Result
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: linux-result
           path: linux-result.json
@@ -40,13 +39,12 @@ jobs:
         run: pip install -e .
       - name: Self-Verification
         run: dcap verify
-      - name: Analyze Test Project
+      - name: Analyze Test
         run: |
           mkdir C:\test_project
           echo eval('test') > C:\test_project\bad.py
           dcap analyze C:\test_project --tier RED --format json > windows-result.json
-      - name: Upload Result
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: windows-result
           path: windows-result.json
@@ -62,13 +60,12 @@ jobs:
         run: pip install -e .
       - name: Self-Verification
         run: dcap verify
-      - name: Analyze Test Project
+      - name: Analyze Test
         run: |
           mkdir -p /tmp/test_project
           echo "eval('test')" > /tmp/test_project/bad.py
           dcap analyze /tmp/test_project --tier RED --format json > macos-result.json
-      - name: Upload Result
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: macos-result
           path: macos-result.json
@@ -99,13 +96,9 @@ jobs:
           MACOS_HASH=$(cat results/macos/macos-result.json | python3 -c "import sys,json; print(json.load(sys.stdin)['artifact_hash'])")
           if [ "$LINUX_HASH" = "$WINDOWS_HASH" ] && [ "$WINDOWS_HASH" = "$MACOS_HASH" ]; then
             echo ""
-            echo "✅ DETERMINISM PROVED: All 3 platforms produced identical artifact hashes."
-            echo "   Hash: $LINUX_HASH"
+            echo "DETERMINISM PROVED: All 3 platforms produced identical artifact hashes."
           else
             echo ""
-            echo "❌ DETERMINISM FAILED: Artifact hashes differ across platforms."
-            echo "   Linux:   $LINUX_HASH"
-            echo "   Windows: $WINDOWS_HASH"
-            echo "   macOS:   $MACOS_HASH"
+            echo "DETERMINISM FAILED: Artifact hashes differ across platforms."
             exit 1
           fi
