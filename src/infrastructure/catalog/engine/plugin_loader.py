@@ -17,8 +17,6 @@ import importlib.util
 import sys
 from pathlib import Path
 
-_CACHE = None
-
 def load_pro_plugin():
     plugin_path = Path(__file__).parent.parent.parent.parent.parent / "constructs_extended_source.cp314-win_amd64.pyd"
     if not plugin_path.exists():
@@ -30,11 +28,10 @@ def load_pro_plugin():
             spec.loader.exec_module(mod)
             return getattr(mod, "EXTENDED_CONSTRUCTS", ())
     except Exception:
-        pass
+        return ()
     return ()
 
 def get_extended_constructs():
-    global _CACHE
-    if _CACHE is None:
-        _CACHE = load_pro_plugin()
-    return _CACHE
+    if not hasattr(get_extended_constructs, "_cache"):
+        get_extended_constructs._cache = load_pro_plugin()
+    return get_extended_constructs._cache
