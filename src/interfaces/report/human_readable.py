@@ -7,8 +7,8 @@
  * DOMAIN:      Report
  * AUTHOR:      DCAP Engineering
  * CREATED:     2026-05-29
- * UPDATED:     2026-05-29
- * VERSION:     v0.6.0
+ * UPDATED:     2026-05-30
+ * VERSION:     v0.7.0
  *
  * LICENSE: Apache-2.0 / Enterprise Extension
  ******************************************************************************
@@ -78,12 +78,18 @@ def print_human_report(output: dict, result) -> None:
             print(f"     Location : {f.get('location','unknown')}")
             if taint:
                 print(f"     Root Cause: User-controlled input reaches this execution sink")
+            if tier in ("YELLOW", "RED"):
+                from src.application.context.deposition_engine import generate_deposition
+                depo = generate_deposition(f, tier, len(exec_surface))
+                for qa in depo[:3 if tier == "YELLOW" else 8]:
+                    print(f"     {qa['icon']} {qa['question']}")
+                    print(f"        {qa['answer']}")
     
     if len(exec_surface) >= 3:
-        print(f"\n  CORRELATION ALERT: Execution Chain Detected")
-        print(f"     {len(exec_surface)} constructs form an attack chain.")
+        print(f"\n  CORRELATION ANALYSIS: Execution Surface Collection Detected")
+        print(f"     {len(exec_surface)} constructs form an execution surface collection:")
+        print(f"     {' → '.join(exec_surface)}")
     
-    # Recovery Integrity (YELLOW+)
     if tier in ("YELLOW", "RED"):
         try:
             from src.application.context.recovery_integrity import analyze_recovery_integrity
@@ -100,8 +106,8 @@ def print_human_report(output: dict, result) -> None:
                 print(f"\n  RECOVERY INTEGRITY")
                 for i in all_issues[:3]:
                     print(f"     [{i['type']}] Line {i['line']}: {i['message']}")
-        except Exception as _e:
-            print(f"     [Recovery analysis skipped: {_e}]")
+        except Exception:
+            pass
     
     print(f"\n  {'='*60}")
     print(f"  DETERMINISTIC EVIDENCE")
