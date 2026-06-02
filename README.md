@@ -1,6 +1,6 @@
 <div align="center">
 
-# DCAVP
+# DCAP
 
 **Security analysis for AI-generated Python code.**
 
@@ -19,15 +19,15 @@ Find dangerous patterns before they reach production.
 Scans your Python code for security issues that AI generators (ChatGPT, Claude, Copilot, Cursor) commonly introduce — and explains them in plain English.
 
 ```bash
-pip install dcavp
-dcavp check ./my_project
+pip install dcap
+dcap check ./my_project
 ```
 
 **Output:**
 
 ```
 ────────────────────────────────────────────────────
-  DCAVP Security Scan
+  DCAP Security Scan
 ────────────────────────────────────────────────────
   Score     35 / 100   🔴  DANGER
   Grade     F
@@ -64,7 +64,7 @@ dcavp check ./my_project
 ## Install
 
 ```bash
-pip install dcavp
+pip install dcap
 ```
 
 Requires Python 3.12+. No external dependencies.
@@ -75,19 +75,19 @@ Requires Python 3.12+. No external dependencies.
 
 ```bash
 # Scan a project (human-readable output)
-dcavp check ./my_project
+dcap check ./my_project
 
 # Generate HTML report
 dcavp check ./my_project --format html --output report.html
 
 # CI mode: fail if critical issues exist
-dcavp check . --fail-on critical
+dcap check . --fail-on critical
 
 # Stricter analysis
-dcavp check . --tier YELLOW
+dcap check . --tier YELLOW
 
 # Show dependency risks
-dcavp catalog
+dcap catalog
 ```
 
 ---
@@ -95,7 +95,7 @@ dcavp catalog
 ## GitHub Actions
 
 ```yaml
-name: DCAVP Security Scan
+name: DCAP Security Scan
 on: [push, pull_request]
 
 jobs:
@@ -107,7 +107,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install dcavp
-      - run: dcavp check . --fail-on critical --format html --output report.html
+      - run: dcap check . --fail-on critical --format html --output report.html
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -169,7 +169,7 @@ trust_band: high · 91/100
 
 ## How it's different
 
-| Feature | DCAVP | Snyk | SonarQube |
+| Feature | DCAP | Snyk | SonarQube |
 |---|---|---|---|
 | Deterministic results | ✅ Always | ❌ No | ❌ No |
 | Plain-English findings | ✅ Yes | Partial | Partial |
