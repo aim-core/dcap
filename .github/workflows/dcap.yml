@@ -1,22 +1,26 @@
 name: DCAP Security Scan
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   security-scan:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Run DCAP scan
-        run: |
-          - run: pip install -e .
-          dcap check . --fail-on critical --format html --output dcap-report.html
-      - name: Upload report
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: dcap-security-report
-          path: dcap-report.html
+
+      - name: Install DCAP
+        run: pip install -e .
+
+      - name: Run self-verification
+        run: dcap verify
+
+      - name: Run analysis on source
+        run: dcap analyze src --tier RED
