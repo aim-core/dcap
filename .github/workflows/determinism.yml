@@ -15,14 +15,19 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install DCAP
-        run: pip install -e .
+        run: |
+          pip install -e .
+          echo "PYTHONPATH=src" >> $GITHUB_ENV
       - name: Self-Verification
-        run: dcap verify
+        run: |
+          export PYTHONPATH="$PYTHONPATH:src"
+          python -m interfaces.cli.dcap_cli verify
       - name: Analyze Test
         run: |
+          export PYTHONPATH="$PYTHONPATH:src"
           mkdir -p /tmp/test_project
           echo "eval('test')" > /tmp/test_project/bad.py
-          dcap analyze /tmp/test_project --tier RED --format json > linux-result.json
+          python -m interfaces.cli.dcap_cli analyze /tmp/test_project --tier RED --format json > linux-result.json
       - uses: actions/upload-artifact@v4
         with:
           name: linux-result
@@ -36,14 +41,19 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install DCAP
-        run: pip install -e .
+        run: |
+          pip install -e .
+          echo "PYTHONPATH=src" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
       - name: Self-Verification
-        run: dcap verify
+        run: |
+          $env:PYTHONPATH = "src"
+          python -m interfaces.cli.dcap_cli verify
       - name: Analyze Test
         run: |
+          $env:PYTHONPATH = "src"
           mkdir C:\test_project
           echo eval('test') > C:\test_project\bad.py
-          dcap analyze C:\test_project --tier RED --format json > windows-result.json
+          python -m interfaces.cli.dcap_cli analyze C:\test_project --tier RED --format json > windows-result.json
       - uses: actions/upload-artifact@v4
         with:
           name: windows-result
@@ -57,14 +67,19 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install DCAP
-        run: pip install -e .
+        run: |
+          pip install -e .
+          echo "PYTHONPATH=src" >> $GITHUB_ENV
       - name: Self-Verification
-        run: dcap verify
+        run: |
+          export PYTHONPATH="$PYTHONPATH:src"
+          python -m interfaces.cli.dcap_cli verify
       - name: Analyze Test
         run: |
+          export PYTHONPATH="$PYTHONPATH:src"
           mkdir -p /tmp/test_project
           echo "eval('test')" > /tmp/test_project/bad.py
-          dcap analyze /tmp/test_project --tier RED --format json > macos-result.json
+          python -m interfaces.cli.dcap_cli analyze /tmp/test_project --tier RED --format json > macos-result.json
       - uses: actions/upload-artifact@v4
         with:
           name: macos-result
@@ -88,17 +103,15 @@ jobs:
           path: results/macos
       - name: Compare Artifact Hashes
         run: |
-          echo "=== LINUX ===" && cat results/linux/linux-result.json | python3 -c "import sys,json; print(json.load(sys.stdin)['artifact_hash'])"
-          echo "=== WINDOWS ===" && cat results/windows/windows-result.json | python3 -c "import sys,json; print(json.load(sys.stdin)['artifact_hash'])"
-          echo "=== MACOS ===" && cat results/macos/macos-result.json | python3 -c "import sys,json; print(json.load(sys.stdin)['artifact_hash'])"
           LINUX_HASH=$(cat results/linux/linux-result.json | python3 -c "import sys,json; print(json.load(sys.stdin)['artifact_hash'])")
           WINDOWS_HASH=$(cat results/windows/windows-result.json | python3 -c "import sys,json; print(json.load(sys.stdin)['artifact_hash'])")
           MACOS_HASH=$(cat results/macos/macos-result.json | python3 -c "import sys,json; print(json.load(sys.stdin)['artifact_hash'])")
+          echo "Linux:   $LINUX_HASH"
+          echo "Windows: $WINDOWS_HASH"
+          echo "macOS:   $MACOS_HASH"
           if [ "$LINUX_HASH" = "$WINDOWS_HASH" ] && [ "$WINDOWS_HASH" = "$MACOS_HASH" ]; then
-            echo ""
-            echo "DETERMINISM PROVED: All 3 platforms produced identical artifact hashes."
+            echo "DETERMINISM PROVED: All 3 platforms identical."
           else
-            echo ""
-            echo "DETERMINISM FAILED: Artifact hashes differ across platforms."
+            echo "DETERMINISM FAILED."
             exit 1
           fi
