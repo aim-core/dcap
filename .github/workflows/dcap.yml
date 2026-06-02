@@ -17,10 +17,16 @@ jobs:
           python-version: '3.12'
 
       - name: Install DCAP
-        run: pip install -e .
+        run: |
+          pip install -e .
+          export PYTHONPATH="$PYTHONPATH:src"
 
       - name: Run self-verification
-        run: dcap verify
+        run: |
+          export PYTHONPATH="$PYTHONPATH:src"
+          python -m interfaces.cli.dcap_cli verify
 
       - name: Run analysis on source
-        run: dcap analyze src --tier RED
+        run: |
+          export PYTHONPATH="$PYTHONPATH:src"
+          python -m interfaces.cli.dcap_cli analyze src --tier RED
