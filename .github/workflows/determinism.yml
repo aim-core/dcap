@@ -14,15 +14,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install DCAVP
+      - name: Install DCAP
         run: pip install -e .
       - name: Self-Verification
-        run: dcavp verify
+        run: dcap verify
       - name: Analyze Test Project
         run: |
           mkdir -p /tmp/test_project
           echo "eval('test')" > /tmp/test_project/bad.py
-          dcavp analyze /tmp/test_project --tier RED --format json > linux-result.json
+          dcap analyze /tmp/test_project --tier RED --format json > linux-result.json
       - name: Upload Result
         uses: actions/upload-artifact@v4
         with:
@@ -36,15 +36,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install DCAVP
+      - name: Install DCAP
         run: pip install -e .
       - name: Self-Verification
-        run: dcavp verify
+        run: dcap verify
       - name: Analyze Test Project
         run: |
           mkdir C:\test_project
           echo eval('test') > C:\test_project\bad.py
-          dcavp analyze C:\test_project --tier RED --format json > windows-result.json
+          dcap analyze C:\test_project --tier RED --format json > windows-result.json
       - name: Upload Result
         uses: actions/upload-artifact@v4
         with:
@@ -58,15 +58,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install DCAVP
+      - name: Install DCAP
         run: pip install -e .
       - name: Self-Verification
-        run: dcavp verify
+        run: dcap verify
       - name: Analyze Test Project
         run: |
           mkdir -p /tmp/test_project
           echo "eval('test')" > /tmp/test_project/bad.py
-          dcavp analyze /tmp/test_project --tier RED --format json > macos-result.json
+          dcap analyze /tmp/test_project --tier RED --format json > macos-result.json
       - name: Upload Result
         uses: actions/upload-artifact@v4
         with:
