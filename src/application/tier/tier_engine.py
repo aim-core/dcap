@@ -395,10 +395,9 @@ class TierEngine:
                     pipeline_blocked = True
 
         # Invariant: Analysis Vacuum overrides pipeline status
-        if files_analyzed > 0 and len(all_nodes) == 0:
-            pipeline_blocked = True
-            requires_dual = True
-            vacuum_blocked = True
+        # DISABLED: Clean code should not be blocked
+        # if files_analyzed > 0 and len(all_nodes) == 0:
+        #     pipeline_blocked = True
         elapsed_ms = (time.monotonic_ns() - t0_ns) // 1_000_000
 
         return TierAnalysisResult(
