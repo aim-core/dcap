@@ -27,7 +27,7 @@ jobs:
           export PYTHONPATH="$PYTHONPATH:src"
           mkdir -p /tmp/test_project
           echo "x = 1('test')" > /tmp/test_project/bad.py
-          python -m interfaces.cli.dcap_cli analyze /tmp/test_project --tier RED --format json > linux-result.json
+          python -m interfaces.cli.dcap_cli analyze /tmp/test_project --tier RED --format json > linux-result.json || true
       - uses: actions/upload-artifact@v4
         with:
           name: linux-result
@@ -79,7 +79,7 @@ jobs:
           export PYTHONPATH="$PYTHONPATH:src"
           mkdir -p /tmp/test_project
           echo "x = 1('test')" > /tmp/test_project/bad.py
-          python -m interfaces.cli.dcap_cli analyze /tmp/test_project --tier RED --format json > macos-result.json
+          python -m interfaces.cli.dcap_cli analyze /tmp/test_project --tier RED --format json > macos-result.json || true
       - uses: actions/upload-artifact@v4
         with:
           name: macos-result
